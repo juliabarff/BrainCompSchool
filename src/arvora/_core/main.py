@@ -88,7 +88,7 @@ class SimplePage:
                 Class="icon-text", style="color: #333;", Id=f"-_{title}_--")
             return h.A(spn, Id=f"_{title}_", Class="navbar-item", href="./#")
 
-        aim = h.IMG(src="/src/arvora/_media/arvora_ico.png", alt="Arvora", height="28", Id="_MAIN_-")
+        aim = h.IMG(src="/src/arvora/_media/arvora_logo.png", alt="Arvora", height="28", Id="_MAIN_-")
         arv = h.A(aim, Id="_MAIN_", Class="navbar-item", href="./")
         nbr = h.DIV(arv, Class="navbar-brand", Id="-_MAIN_-")
         self.items = [do_item(**item) for item in menu]
@@ -107,12 +107,14 @@ class LandingPage(SimplePage):
     # Constroi a lading page,, essa é bem intuitiva
     def build_body(self):
         h = self.brython.html
-        tt1 = h.P("A R V O R A", Class="title main-text has-text-weight-bold")
-        tt2 = h.P("Brain Computational School", Class="title is-1 main-text")
+        tt1 = h.IMG(src="/src/arvora/_media/arvora_logo.png", style="width: 465px;")
+        tt1D = h.DIV(tt1)
+        tt2 = h.IMG(src="/src/arvora/_media/asset2.png", style="width: 265px;margin-top:10px")
+        tt2D = h.DIV(tt2)
         # phr = phrase
         phr = h.P("Seu lugar de pesquisas de neurociência!", Class='main-text title is-3')
         # retorna uma div com todos os elementos da página
-        return h.DIV((tt1, tt2, phr))
+        return h.DIV((tt1D, tt2D, phr))
 
 
 
