@@ -25,7 +25,7 @@ Changelog
 # Então, basicamente ele está transformando essa string com esses nomes em duas listas de substrings e juntando elas com o zip, e depois, transformando elas em uma tupla dos elementos dessa junção das sublistas. Aqui tem as partes do menu. Uma tupla é uma sequência imutável de valores. A função zip combina duas listas, combina o primeiro elemento da lista 1 com o primeiro elememto da lista 2. A função slip faz com que a string se transforme em uma lista de substrings.
 MENU_OPTIONS = tuple(zip("PROJETO CONHECIMENTO PESQUISA PERGUNTAS LOGIN USER RASCUNHO ESCREVER ARTIGO".split(),
                          "bars-progress book book-medical question right-to-bracket user".split()))
-
+import browser.ajax as ajax
 import json
 # Aqui uma base de página é criado.
 class SimplePage:
@@ -152,17 +152,23 @@ class LoginPage(SimplePage):
         #verificando se os dados estão corretos
 
 
-
-
-
         data = {
             "email": email,
             "password": password,
         }
-        print("testando")
+        print(data)
+        #if data['email'] == email:
+         #   print('deu certo')
+        #else:
+         #   print('n foi')
+
+
         self.write(data)
+
         # USER_OPTIONS = form.elements["username"].value
         # Arvora.ARVORA.user(form.elements["username"].value)
+
+
 
 
     def build_body(self):
@@ -545,7 +551,7 @@ class Article(SimplePage):
                             Class="card-image image is-4by3")
 
         card_content = h.DIV((
-            h.FIGURE((h.IMG(src="https://res.cloudinary.com/ameo/image/upload/v1639144778/typocat_svbspx.png")),
+            h.FIGURE((h.IMG(src="/src/arvora/_media/arvora_logo.png")),
                      Class="media-left image is-48x48"),
             h.P(user["name"], Class="title is-4"),
             h.P(user["email"], Class="subtitle is-6"),
