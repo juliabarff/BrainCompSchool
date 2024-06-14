@@ -131,7 +131,18 @@ class LoginPage(SimplePage):
                 print("complete ok: " + f'{req.status}')
                 if json.loads(req.text) == "ok":
                     SimplePage.PAGES["_MAIN_"].show()
-
+                if json.loads(req.text) == "!ok":
+                    div_resultados = self.brython.document['resultado']
+                    div_resultados.clear()
+                    text = self.brython.html.P('Senha incorreta.')
+                    men = self.brython.html.DIV(text, Class="notification is-danger is-light")
+                    div_resultados <= men
+                if json.loads(req.text) == "error":
+                    div_resultados = self.brython.document['resultado']
+                    div_resultados.clear()
+                    text = self.brython.html.P('Este e-mail não esta cadastrado.')
+                    men = self.brython.html.DIV(text, Class="notification is-danger is-light")
+                    div_resultados <= men
             else:
                 print("error detected: " + f'{req.status}')
 
@@ -179,6 +190,7 @@ class LoginPage(SimplePage):
         h = self.brython.html
 
         # email
+        resultado = h.DIV(id = "resultado")
         ema = h.LABEL('E-mail', Class="label mt-4", style="text-align: left;")
         self.login = h.INPUT(Id="email", Class="input is-success", type="email", placeholder="ex.: alexsmith@hhh.com")
         emaC = h.DIV(self.login, Class="control")
@@ -207,7 +219,7 @@ class LoginPage(SimplePage):
         linkD = h.DIV(link, Class="field column is-half is-offset-one-quarter", style="width:500px;")
         finall = h.DIV(linkD, Class="columns is-mobile")
         link.bind("click", click)
-        form = h.DIV((finale, finalg, finall, finalh), Class="column")
+        form = h.DIV((resultado,finale, finalg, finall, finalh), Class="column")
         # Aqui ele bota um submit ao apertar o botão do form e chama a função click
         button.bind("click", self.click)
 
@@ -511,7 +523,7 @@ class KnowledgePage(SimplePage):
                     h.P("email", Class="subtitle is-6"),
                     h.P("Estrelas: " + "10"),
                     h.P(article.get("body")),
-                    h.P("tags"),
+                    h.P(article.get("tags")),
                     h.P("data")), Class="content")
 
                 card_buttons = h.DIV((
@@ -613,9 +625,11 @@ class WritingPage(SimplePage):
         # form = doc['form'].html
         title = doc["title"].value
         body = doc["body"].value
+        tags = doc["tags"].value
         data = {
             "title": title,
-            "body": body
+            "body": body,
+            "tags": tags
         }
 
         self.write(data)
@@ -643,8 +657,11 @@ class WritingPage(SimplePage):
         aut = h.INPUT(placeholder='Título',
                       Id = "title",
                       Class='input is-success has-fixed-size block has-text-success-dark is-medium')
+        tag = h.INPUT(placeholder='Tags',
+                      Id = "tags",
+                      Class='input is-success has-fixed-size block has-text-success-dark is-medium')
         # Aqui eu to adicionando tudo dentro da div, na ordem que eu quero que eles aparecam
-        div <= (tit, aut, self.text)
+        div <= (tit, aut, self.text, tag)
         # aqui eu encapsulei a div com tudo e o botão em um formulário
         btn1.bind("click", self.click)
         form = h.DIV((div, btn1, btn2), Id = 'form', Class="column")
@@ -688,14 +705,16 @@ class DraftPage(SimplePage):
 
                 title = d.get("title")
                 body = d.get("body")
+                tags = d.get("tags")
 
                 tit = h.P(title, Class='title is-4')
                 abst = h.P(body, Class='text is-6')
+                tag = h.P(tags, Class="text is-6")
                 btnd = h.BUTTON("Deletar", Class="button is-danger is-rounded mt-5 is-responsive block is-fullwidth",
                                 type='submit')
 
                 # todos os rascunhos
-                tor.append(h.DIV((tit, abst, btnd), Class='box'))
+                tor.append(h.DIV((tit, abst, tag, btnd), Class='box'))
             wrp.clear()
             wrp <= h.DIV((bt, tor), Class="column body-columns")
 
