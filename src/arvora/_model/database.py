@@ -45,16 +45,13 @@ class User:
         password = user_data['password']
         print(email)
         if(db_user.search(User.email == email)):
-            print("asdasda")
-            return "ok"
             if db_user.search(User.password == password):
-                 return "ok"
+                return "ok"
             else:
-                return "error"
-
+                return "!ok"
         else:
-            print("asdasda1")
             return "error"
+            print("asdasda1")
 
     @classmethod
     def create(cls, user):
@@ -87,10 +84,12 @@ class Article:
     def insert(cls, data):
         article = json.loads(data.decode('utf-8'))
         print(article['title'])
+        print(article['tags'])
         # article = {
         #     "title": data.title,
         #     #"autor": data.author,
         #     "body": data.body,
+        #     "tags": data.tags
         #     #"published": data.published
         # }
         db.insert(article)
