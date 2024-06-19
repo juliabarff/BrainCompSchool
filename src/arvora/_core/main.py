@@ -106,6 +106,7 @@ class LandingPage(SimplePage):
 
     # Constroi a lading page,, essa é bem intuitiva
     def build_body(self):
+
         h = self.brython.html
         tt1 = h.IMG(src="/src/arvora/_media/arvora_logo.png", style="width: 465px;")
         tt1D = h.DIV(tt1)
@@ -131,18 +132,19 @@ class LoginPage(SimplePage):
                 print("complete ok: " + f'{req.status}')
                 if json.loads(req.text) == "ok":
                     SimplePage.PAGES["_MAIN_"].show()
-                if json.loads(req.text) == "!ok":
-                    div_resultados = self.brython.document['resultado']
-                    div_resultados.clear()
-                    text = self.brython.html.P('Senha incorreta.')
-                    men = self.brython.html.DIV(text, Class="notification is-danger is-light")
-                    div_resultados <= men
                 if json.loads(req.text) == "error":
                     div_resultados = self.brython.document['resultado']
                     div_resultados.clear()
                     text = self.brython.html.P('Este e-mail não esta cadastrado.')
                     men = self.brython.html.DIV(text, Class="notification is-danger is-light")
                     div_resultados <= men
+                if json.loads(req.text) == "!ok":
+                    div_resultados = self.brython.document['resultado']
+                    div_resultados.clear()
+                    text = self.brython.html.P('Senha incorreta.')
+                    men = self.brython.html.DIV(text, Class="notification is-danger is-light")
+                    div_resultados <= men
+
             else:
                 print("error detected: " + f'{req.status}')
 
@@ -348,7 +350,6 @@ class PesquisaPage(SimplePage):
             tor = []
             # Loop que mostra as páginas de rascunho
             pes_value = pes.value
-            print(f"Valor da pesquisa: {pes_value}")
             for d in resultados:
                 print("u")
                 if pes_value == d.get("tags"):
