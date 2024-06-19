@@ -117,8 +117,8 @@ class LoginHandler(tornado.web.RequestHandler):
         self.write(json.dumps(text))
 
 class UserHandler(tornado.web.RequestHandler):
-    # def get(self, data):
-    #     DS.User.login(data)
+    def get(self):
+         self.write(json.dumps(DS.User.load_users()))
     def post(self):
         data = self.request.body
         text = DS.User.create(data)

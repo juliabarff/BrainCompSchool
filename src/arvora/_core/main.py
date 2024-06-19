@@ -227,6 +227,12 @@ class LoginPage(SimplePage):
         cls = h.DIV(form, Class="columns is-flex is-centered")
         return cls
 
+
+
+
+
+0
+
 class CadastroPage(SimplePage):
     def __init__(self, brython, menu=MENU_OPTIONS):
         super().__init__(brython, menu, hero="main_pesquisa")
@@ -255,7 +261,7 @@ class CadastroPage(SimplePage):
                     SimplePage.PAGES["_MAIN_"].show()
             else:
                 print("error detected " + f'{req.status}')
-
+        print(data)
         req = ajax.Ajax()
         req.bind("complete", on_complete)
         req.open('POST', '/save-user', True)
@@ -311,13 +317,74 @@ class PesquisaPage(SimplePage):
     def __init__(self, brython, menu=MENU_OPTIONS):
         super().__init__(brython, menu, hero="main_pesquisa")
 
+
     def build_body(self):
         h = self.brython.html
+        ajax = self.brython.ajax
+        tor = []
+
+        def refresh(ev):
+            def on_complete(req):
+                if req.status == 200:
+                    text = req.text
+                    try:
+                        resultados = json.loads(text)
+
+                    except:
+                        resultados = [{"title": "Rascunho 1", "abstract": "resumo"},
+                                  {"title": "Rascunho 2", "abstract": "resumo 2"},
+                                  {"title": "Rascunho 3", "abstract": "resumo 3"}]
+                    show(resultados)
+
+            wrp.clear()
+            wrp <= h.DIV((img, pes, bt), Class="column body-columns")
+            req = ajax.Ajax()
+            req.bind('complete', on_complete)
+            req.open('GET', '/load-article', True)
+            req.set_header('content-type', 'application/json')
+            req.send()
+
+        def show(resultados):
+            tor = []
+            # Loop que mostra as páginas de rascunho
+            pes_value = pes.value
+            print(f"Valor da pesquisa: {pes_value}")
+            for d in resultados:
+                print("u")
+                if pes_value == d.get("tags"):
+                    title = d.get("title")
+                    body = d.get("body")
+                    tags = d.get("tags")
+
+                    tit = h.P(title, Class='title is-4')
+                    abst = h.P(body, Class='text is-6')
+                    tag = h.P(("tag: ", tags), Class="text is-6")
+
+
+                    # todos os rascunhos
+                    tor.append(h.DIV((tit, abst, tag), Class='box'))
+
+
+
+            wrp.clear()
+            wrp <= h.DIV( tor, Class="column body-columns")
+
+
+
+
+            return wrp
+
         img = h.IMG(src="/src/arvora/_media/arvora_logo.png", Class="img_logo")
         log = h.IMG(src="/src/arvora/_media/lupa.svg", style="width: 365px;")
         pes = h.INPUT(log, type="text", Class="input is-success is-rounded mt-5 input-icon", placeholder="Rounded in", style="width: 1000px;")
-        but = h.BUTTON("Pesquisar", Class="button is-success is-rounded mt-5 is-responsive", width="68")
-        return h.DIV((img,pes,but))
+        bt = h.BUTTON("Pesquisar", id="bt-pesquisa", Class="button is-success is-rounded mt-5 is-responsive", width="68", type='submit').bind("click", refresh)
+
+
+        wrp = h.DIV((img,pes, bt, tor), Class="column body-columns")
+
+        return wrp
+
+
 class ProjectPage(SimplePage):
     def __init__(self, brython, menu=MENU_OPTIONS):
         super().__init__(brython, menu, hero="main_hero")
@@ -498,7 +565,6 @@ class KnowledgePage(SimplePage):
                                   {"title": "Rascunho 2", "abstract": "resumo 2"},
                                   {"title": "Rascunho 3", "abstract": "resumo 3"}]
                     show(drafts)
-
             req = ajax.Ajax()
             req.bind('complete', on_complete)
             req.open('GET', '/load-article', True)
@@ -652,7 +718,7 @@ class WritingPage(SimplePage):
         # Aqui eu criei uma div para armazenar todos os componentes da página
         div = h.DIV()
         # tit == titulo. Esse é o título da página
-        tit = h.P("Escreva seu artigo", Class='title is-2 block hero p-2 has-text-success incText')
+        tit = h.P("Escrev0a seu artigo", Class='title is-2 block hero p-2 has-text-success incText')
         # aut == autor. Aqui que a pessoa pode botar o nome dela ((só uma ideia inicial))
         aut = h.INPUT(placeholder='Título',
                       Id = "title",
@@ -670,7 +736,7 @@ class WritingPage(SimplePage):
         quest = h.DIV(form, Class="columns is-flex")
         # Aqui eu to retornando a div com todos os elementos
         return quest
-    
+
 class DraftPage(SimplePage):
 
     def __init__(self, brython, menu=MENU_OPTIONS):
@@ -709,7 +775,7 @@ class DraftPage(SimplePage):
 
                 tit = h.P(title, Class='title is-4')
                 abst = h.P(body, Class='text is-6')
-                tag = h.P(tags, Class="text is-6")
+                tag = h.P(("tags: ", tags), Class="text is-6")
                 btnd = h.BUTTON("Deletar", Class="button is-danger is-rounded mt-5 is-responsive block is-fullwidth",
                                 type='submit')
 

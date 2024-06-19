@@ -75,6 +75,10 @@ class User:
         #
         #     else:
         #         print("Usuário já existente")
+
+    @classmethod
+    def load_users(cls):
+        return db_user.all()
 class Article:
     @classmethod
     def load_articles(cls):
