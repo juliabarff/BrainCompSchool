@@ -56,6 +56,7 @@ class User:
     @classmethod
     def create(cls, user):
         User = Query()
+        usu = json.loads(user.decode('utf-8'))
         _user = json.loads(user)
         if db_user:
             print("dadhasuifr")

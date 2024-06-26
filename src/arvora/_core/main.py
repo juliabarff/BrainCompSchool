@@ -94,7 +94,7 @@ class SimplePage:
         self.items = [do_item(**item) for item in menu]
         end = h.DIV(self.items[-1], Class="navbar-end")
         self.items = items = [nbr] + self.items[:-1] + [end]
-        nav = h.NAV(items, Class="navbar")
+        nav = h.NAV(items, Class="navbar is-transparent")
         fna = h.DIV(h.DIV(nav, Class="container"), Class="first_nav")
         return fna
 
@@ -131,7 +131,42 @@ class LoginPage(SimplePage):
             if req.status==200:
                 print("complete ok: " + f'{req.status}')
                 if json.loads(req.text) == "ok":
-                    SimplePage.PAGES["_MAIN_"].show()
+                    def read(req):
+                        try:
+                            dados = req.json
+                            email = data['email']
+                            h = self.brython.html
+                            for d in dados:
+                                if d.get('email') == email:
+                                    div_resultados = self.brython.document['loginOK']
+                                    div_resultados.clear()
+                                    text = h.P(d.get('name'))
+                                    text1 =h.P(d.get('email'))
+                                    text2 = h.P(d.get('phone'))
+
+                                    com = h.P(("Olá, ", text), Class="text is-6")
+                                    com1 = h.P(("email: ", text1), Class="text is-6")
+                                    com2 = h.P(("telefone: ", text2), Class="text is-6")
+
+                                    #coluna 1
+                                    tit = h.P('PERFIL')
+                                    icon = h.I(Class="fas fa-book")
+                                    nome = h.SPAN(icon, Class="panel-icon")
+                                    tudo = h.A((nome, "Teste"), Class="panel-block is-active")
+                                    tu = h.ARTICLE((tit,tudo), Class="panel is-success")
+                                    col = h.DIV(tu, Class="column is-two-fifths")
+
+                                    #coluna2
+
+                                    men = h.DIV(col, Class="columns")
+                                    div_resultados <= men
+                        except Exception as e:
+                            print('erro ao processar os dados: ', e)
+
+                        # print(nova[0]['name'])
+
+                    ajax.get("/save-user", mode="json", oncomplete=read)
+
                 if json.loads(req.text) == "error":
                     div_resultados = self.brython.document['resultado']
                     div_resultados.clear()
@@ -226,7 +261,7 @@ class LoginPage(SimplePage):
         button.bind("click", self.click)
 
         # Aqui ele retorna a div com todos os elementos, após aplicar o bulma
-        cls = h.DIV(form, Class="columns is-flex is-centered")
+        cls = h.DIV(form, Class="columns is-flex is-centered", id="loginOK")
         return cls
 
 
@@ -269,6 +304,7 @@ class CadastroPage(SimplePage):
         req.open('POST', '/save-user', True)
         req.set_header("content-Type", "application/json")
         req.send(json.dumps(data))
+
 
         #SimplePage.PAGES["_MAIN_"].show()
 
@@ -574,21 +610,10 @@ class KnowledgePage(SimplePage):
 
         def show(articles):
             card = ""
-            search_bar = h.FORM(h.DIV(
-                h.INPUT(type="text", Class="input is-success is-rounded mt-5 input-icon green-placeholder",
-                        placeholder="Pesquise aqui"), Class="column"))
             # Loop que mostra as páginas de rascunho
             for article in articles:
-                card_img = h.FIGURE(h.IMG(src="https://bulma.io/images/placeholders/256x256.png"),
-                                    Class="card-image image is-4by3")
-
                 card_content = h.DIV((
-                    h.FIGURE(
-                        (h.IMG(src="https://res.cloudinary.com/ameo/image/upload/v1639144778/typocat_svbspx.png")),
-                        Class="media-left image is-48x48"),
                     h.P(article.get("title"), Class="title is-4"),
-                    h.P("email", Class="subtitle is-6"),
-                    h.P("Estrelas: " + "10"),
                     h.P(article.get("body")),
                     h.P(article.get("tags")),
                     h.P("data")), Class="content")
@@ -598,8 +623,8 @@ class KnowledgePage(SimplePage):
                     h.BUTTON("Perguntar", Class="button is-info"),
                     h.BUTTON("Artigos Filhos", Class="button")), Class="card-footer")
 
-                card += h.DIV((card_img, card_content, card_buttons), Class="box").bind("click", self.show_article)
-            post = h.DIV((search_bar, card), Class="column is-half is-offset-one-quarter ")
+                card += h.DIV(( card_content, card_buttons), Class="box").bind("click", self.show_article)
+            post = h.DIV((card), Class="column is-half is-offset-one-quarter ")
             posts.clear()
             posts <= h.DIV(post, Class="columns body-columns")
             return posts
@@ -626,15 +651,11 @@ class Article(SimplePage):
         user = users[0]
 
 
-        card_img = h.FIGURE(h.IMG(src="https://bulma.io/images/placeholders/256x256.png"),
-                            Class="card-image image is-4by3")
+
 
         card_content = h.DIV((
-            h.FIGURE((h.IMG(src="/src/arvora/_media/arvora_logo.png")),
-                     Class="media-left image is-48x48"),
+
             h.P(user["name"], Class="title is-4"),
-            h.P(user["email"], Class="subtitle is-6"),
-            h.P("Estrelas: " + user["points"]),
             h.P(user["text"]),
             h.P(user["tags"]),
             h.P(user["date"])), Class="content")
@@ -654,13 +675,10 @@ class Article(SimplePage):
 
 
         #user comment
-        user_photo = h.FIGURE(
-            h.P((h.IMG(src="https://bulma.io/images/placeholders/128x128.png")), Class="image is-64x64"),
-            Class="media-left")
         comment_box = h.DIV(h.TEXTAREA(placeholder = "Escreva aqui...", Class = " Focused textarea is-success has-fixed-size has-text-success-dark"), Class = "media-content field control")
-        comment_section = h.ARTICLE((user_photo, comment_box), Class="media mt-5")
+        comment_section = h.ARTICLE((comment_box), Class="media mt-5")
 
-        card = h.DIV((card_img, card_content, card_buttons, comment_section), Class="box")
+        card = h.DIV(( card_content, card_buttons, comment_section), Class="box")
         post = h.DIV(card, Class="column is-half is-offset-one-quarter ")
         posts = h.DIV(post, Class="columns body-columns")
 
