@@ -59,11 +59,9 @@ class User:
         usu = json.loads(user.decode('utf-8'))
         _user = json.loads(user)
         if db_user:
-            print("dadhasuifr")
             if not db_user.search(User.email == _user.get("email")):
                 db_user.insert(_user)
             else:
-                print("coe")
                 return {"message": "error"}
         else:
             db_user.insert(_user)

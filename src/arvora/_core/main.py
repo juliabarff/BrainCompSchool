@@ -27,6 +27,7 @@ MENU_OPTIONS = tuple(zip("PROJETO CONHECIMENTO PESQUISA PERGUNTAS LOGIN USER RAS
                          "bars-progress book book-medical question right-to-bracket user".split()))
 import browser.ajax as ajax
 import json
+
 # Aqui uma base de página é criado.
 class SimplePage:
     # Essa classe tem um dicionário de páginas
@@ -141,29 +142,40 @@ class LoginPage(SimplePage):
                                     div_resultados = self.brython.document['loginOK']
                                     div_resultados.clear()
                                     text = h.P(d.get('name'))
-                                    text1 =h.P(d.get('email'))
-                                    text2 = h.P(d.get('phone'))
+                                    text1 =h.P(d.get('email'), style="margin-left: 10px;")
+                                    text2 = h.P(d.get('phone'), style="margin-left: 10px;")
 
-                                    com = h.P(("Olá, ", text), Class="text is-6")
-                                    com1 = h.P(("email: ", text1), Class="text is-6")
-                                    com2 = h.P(("telefone: ", text2), Class="text is-6")
+
 
                                     #coluna 1
-                                    tit = h.P('PERFIL')
-                                    icon = h.I(Class="fas fa-book")
-                                    nome = h.SPAN(icon, Class="panel-icon")
-                                    tudo = h.A((nome, "Teste"), Class="panel-block is-active")
-                                    tu = h.ARTICLE((tit,tudo), Class="panel is-success")
-                                    col = h.DIV(tu, Class="column is-two-fifths")
+                                    #titulo
+                                    tit = h.P('PERFIL', Class="panel-heading", style="text-align: left;")
 
-                                    #coluna2
+                                    #email
+                                    emaI = h.I(Class="fas fa-book")
+                                    ema = h.SPAN(emaI, Class="panel-icon")
+                                    tudo = h.A((ema, emaI, text1), Class="panel-block is-active")
 
-                                    men = h.DIV(col, Class="columns")
+                                    #telefone
+                                    telI = h.I(Class="fas fa-book")
+                                    tel = h.SPAN(telI, Class="panel-icon")
+                                    tudo1 = h.A((tel, telI, text2), Class="panel-block is-active")
+
+                                    # encapsula todas as informações do perfil
+                                    col = h.NAV((tit, tudo, tudo1), Class="panel is-success", style="width: 300px")
+                                    perfil = h.DIV((col), Class="col")
+
+                                    # coluna2
+                                    hel = h.DIV(("Ola, seja bem-vindo ", text), Class="col")
+
+                                    #encapsula as duas colunas
+                                    row = h.DIV((perfil, hel), Class="row align-items-start")
+                                    entrada = h.DIV(row, Class="container text-center")
+                                    men = entrada
                                     div_resultados <= men
+
                         except Exception as e:
                             print('erro ao processar os dados: ', e)
-
-                        # print(nova[0]['name'])
 
                     ajax.get("/save-user", mode="json", oncomplete=read)
 
