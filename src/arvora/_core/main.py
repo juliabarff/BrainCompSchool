@@ -142,7 +142,7 @@ class LoginPage(SimplePage):
                                     div_resultados = self.brython.document['loginOK']
                                     div_resultados.clear()
                                     text = h.P(d.get('name'))
-                                    text1 =h.P(d.get('email'), style="margin-left: 10px;")
+                                    text1 = h.P(d.get('email'), style="margin-left: 10px;")
                                     text2 = h.P(d.get('phone'), style="margin-left: 10px;")
 
 
@@ -396,11 +396,10 @@ class PesquisaPage(SimplePage):
 
         def show(resultados):
             tor = []
-            # Loop que mostra as páginas de rascunho
+            #Loop que mostra os resultados da pesquisa
             pes_value = pes.value
             for d in resultados:
-                print("u")
-                if pes_value == d.get("tags"):
+                if pes_value in d.get("tags"):
                     title = d.get("title")
                     body = d.get("body")
                     tags = d.get("tags")
@@ -412,6 +411,10 @@ class PesquisaPage(SimplePage):
 
                     # todos os rascunhos
                     tor.append(h.DIV((tit, abst, tag), Class='box'))
+
+                #else:
+                #    dan = h.P("Não há artigos com esta tag.", Class='title is-4')
+                #    tor.append(h.DIV(dan, Class='box'))
 
 
 
