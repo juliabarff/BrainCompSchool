@@ -26,6 +26,7 @@ Changelog
 MENU_OPTIONS = tuple(zip("PROJETO CONHECIMENTO PESQUISA PERGUNTAS LOGIN USER RASCUNHO ESCREVER ARTIGO".split(),
                          "bars-progress book book-medical question right-to-bracket user".split()))
 import browser.ajax as ajax
+from browser.local_storage import storage
 import json
 
 # Aqui uma base de página é criado.
@@ -113,10 +114,11 @@ class LandingPage(SimplePage):
         tt1D = h.DIV(tt1)
         tt2 = h.IMG(src="/src/arvora/_media/asset2.png", style="width: 265px;margin-top:10px")
         tt2D = h.DIV(tt2)
+        teste = h.P(('teste', storage['foo']), Class='main-text title is-3')
         # phr = phrase
         phr = h.P("Seu lugar de pesquisas de neurociência!", Class='main-text title is-3')
         # retorna uma div com todos os elementos da página
-        return h.DIV((tt1D, tt2D, phr))
+        return h.DIV((tt1D, tt2D, phr, teste))
 
 
 
@@ -132,52 +134,9 @@ class LoginPage(SimplePage):
             if req.status==200:
                 print("complete ok: " + f'{req.status}')
                 if json.loads(req.text) == "ok":
-                    def read(req):
-                        try:
-                            dados = req.json
-                            email = data['email']
-                            h = self.brython.html
-                            for d in dados:
-                                if d.get('email') == email:
-                                    div_resultados = self.brython.document['loginOK']
-                                    div_resultados.clear()
-                                    text = h.P(d.get('name'))
-                                    text1 = h.P(d.get('email'), style="margin-left: 10px;")
-                                    text2 = h.P(d.get('phone'), style="margin-left: 10px;")
-
-
-
-                                    #coluna 1
-                                    #titulo
-                                    tit = h.P('PERFIL', Class="panel-heading", style="text-align: left;")
-
-                                    #email
-                                    emaI = h.I(Class="fas fa-book")
-                                    ema = h.SPAN(emaI, Class="panel-icon")
-                                    tudo = h.A((ema, emaI, text1), Class="panel-block is-active")
-
-                                    #telefone
-                                    telI = h.I(Class="fas fa-book")
-                                    tel = h.SPAN(telI, Class="panel-icon")
-                                    tudo1 = h.A((tel, telI, text2), Class="panel-block is-active")
-
-                                    # encapsula todas as informações do perfil
-                                    col = h.NAV((tit, tudo, tudo1), Class="panel is-success", style="width: 300px")
-                                    perfil = h.DIV((col), Class="col")
-
-                                    # coluna2
-                                    hel = h.DIV(("Ola, seja bem-vindo ", text), Class="col")
-
-                                    #encapsula as duas colunas
-                                    row = h.DIV((perfil, hel), Class="row align-items-start")
-                                    entrada = h.DIV(row, Class="container text-center")
-                                    men = entrada
-                                    div_resultados <= men
-
-                        except Exception as e:
-                            print('erro ao processar os dados: ', e)
-
-                    ajax.get("/save-user", mode="json", oncomplete=read)
+                    storage['email'] = data['email']
+                    storage['logged_in'] = 'true'
+                    self.mostra_perfil(data)
 
                 if json.loads(req.text) == "error":
                     div_resultados = self.brython.document['resultado']
@@ -200,6 +159,60 @@ class LoginPage(SimplePage):
         req.open('POST', '/login', True)
         req.set_header('content-type', 'application/json')
         req.send(json.dumps(data))
+
+    def verificar_sessao(self):
+        if 'logged_in' in storage and storage['logged_in'] == 'true':
+            self.mostra_perfil()
+        else:
+            print("deu erro")
+
+    def mostra_perfil(self,data=None):
+        def read(req):
+            try:
+                dados = req.json
+                email = storage['email']
+                h = self.brython.html
+                print("1")
+                for d in dados:
+                    if d.get('email') == email:
+                        div_resultados = self.brython.document['loginOK']
+                        div_resultados.clear()
+                        #text = h.P(d.get('name'))
+                        #text1 = h.P(d.get('email'), style="margin-left: 10px;")
+                        text2 = h.P(email,  style="margin-left: 10px;")
+
+                        """# coluna 1
+                        # titulo
+                        tit = h.P('PERFIL', Class="panel-heading", style="text-align: left;")
+
+                        # email
+                        emaI = h.I(Class="fas fa-book")
+                        ema = h.SPAN(emaI, Class="panel-icon")
+                        tudo = h.A((ema, emaI, text1), Class="panel-block is-active")
+
+                        # telefone
+                        telI = h.I(Class="fas fa-book")
+                        tel = h.SPAN(telI, Class="panel-icon")
+                        tudo1 = h.A((tel, telI, text2), Class="panel-block is-active")
+
+                        # encapsula todas as informações do perfil
+                        col = h.NAV((tit, tudo, tudo1), Class="panel is-success", style="width: 300px")
+                        perfil = h.DIV((col), Class="col")
+
+                        # coluna2
+                        hel = h.DIV(("Ola, seja bem-vindo ", text), Class="col")
+                        """
+                        # encapsula as duas colunas
+                        row = h.DIV((text2), Class="row align-items-start")
+                        entrada = h.DIV((row,), Class="container text-center")
+                        div_resultados <= entrada
+
+            except Exception as e:
+                print('erro ao processar os dados: ', e)
+
+        ajax.get("/save-user", mode="json", data=json.dumps(data), oncomplete=read)
+
+        print('foi')
     def click(self, ev=None):
         _ = self
         _ = self
@@ -232,6 +245,7 @@ class LoginPage(SimplePage):
 
 
     def build_body(self):
+        self.verificar_sessao()
         def click(ev):
             if ev.target.id == "cadastro":
                 SimplePage.PAGES["_CADASTRO_"].show()
