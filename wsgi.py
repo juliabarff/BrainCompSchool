@@ -40,22 +40,24 @@ options.parse_command_line(final=True)
 PORT = options.port
 DEBUG = options.debug
 ROUTE_TO_INDEX = options.route_to_index
+ROUTE_TO_INDEX = True
 PATH = '/'
 
 
 class DirectoryHandler(tornado.web.StaticFileHandler):
     def validate_absolute_path(self, root, absolute_path):
-        print(absolute_path, self.request.uri, os.path.isdir(absolute_path))
+        print("val0", absolute_path, self.request.uri, os.path.isdir(absolute_path))
         if ROUTE_TO_INDEX and self.request.uri != '/' and '.' not in self.request.uri:
             uri = self.request.uri
+            print("validate", uri)
             if self.request.uri.endswith('/'):
                 uri = uri[:-1]
 
-            absolute_path = absolute_path.replace(uri, '/index.html')
+            absolute_path = absolute_path.replace(uri, 'index.html')
 
         if os.path.isdir(absolute_path):
-            index = os.path.join(absolute_path, 'index.html')
-            print("os.path.isfile(index)", index, absolute_path)
+            index = os.path.join(absolute_path, 'src/arvora/index.html')
+            print("os.path.isfile(index)", index, root, os.path.isfile(index))
             if os.path.isfile(index):
                 print("if os.path.isfile(index)", index, absolute_path)
                 return index
@@ -82,6 +84,7 @@ class DirectoryHandler(tornado.web.StaticFileHandler):
     @classmethod
     def get_content(cls, abspath, start=None, end=None):
         relative_path = abspath.replace(os.getcwd(), '') + '/'
+        print("get content", relative_path, abspath)
 
         if os.path.isdir(abspath):
             html = ('<html><title>Directory listing for %s</title><body><h2>Directory listing for %s</h2><hr><ul>'
@@ -117,8 +120,8 @@ class LoginHandler(tornado.web.RequestHandler):
         self.write(json.dumps(text))
 
 class UserHandler(tornado.web.RequestHandler):
-    # def get(self, data):
-    #     DS.User.login(data)
+    def get(self):
+         self.write(json.dumps(DS.User.load_users()))
     def post(self):
         data = self.request.body
         text = DS.User.create(data)
@@ -137,6 +140,7 @@ application = tornado.web.Application([
     (r'/save-user',  UserHandler),
     (r'/login', LoginHandler),
     (r'/(.*)', DirectoryHandler, {'path': './'}),
+    #(r'/', DirectoryHandler, {'path': './src/arvora/index.html'}),
 ], **settings)
 
 if __name__ == "__main__":

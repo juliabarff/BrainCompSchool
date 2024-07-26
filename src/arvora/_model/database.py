@@ -56,13 +56,12 @@ class User:
     @classmethod
     def create(cls, user):
         User = Query()
+        usu = json.loads(user.decode('utf-8'))
         _user = json.loads(user)
         if db_user:
-            print("dadhasuifr")
             if not db_user.search(User.email == _user.get("email")):
                 db_user.insert(_user)
             else:
-                print("coe")
                 return {"message": "error"}
         else:
             db_user.insert(_user)
@@ -75,6 +74,10 @@ class User:
         #
         #     else:
         #         print("Usuário já existente")
+
+    @classmethod
+    def load_users(cls):
+        return db_user.all()
 class Article:
     @classmethod
     def load_articles(cls):
