@@ -113,6 +113,28 @@ class ArticleHandler(tornado.web.RequestHandler):
         DS.Article.insert(data)
         self.write(json.dumps({"message": "Article saved"}))
 
+
+class UpdateStatusHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Content-Type", 'application/json')
+
+    def post(self):
+        try:
+            data = json.loads(self.request.body)
+            title = data['title']
+            new_status = data['status']
+
+            updated_article = DS.Article.update_status(title, new_status)
+            if updated_article:
+                self.write(json.dumps({'message': 'Status atualizado com sucesso', 'article': updated_article}))
+            else:
+                self.set_status(404)
+                self.write(json.dumps({'error': 'Artigo não encontrado'}))
+        except Exception as e:
+            self.set_status(500)
+            self.write(json.dumps({'error': str(e)}))
+
+
 class LoginHandler(tornado.web.RequestHandler):
     def post(self):
         data = self.request.body
@@ -138,6 +160,7 @@ application = tornado.web.Application([
     (r'/save-article', ArticleHandler),
     (r'/load-article', ArticleHandler),
     (r'/save-user',  UserHandler),
+    (r"/update-status", UpdateStatusHandler),
     (r'/login', LoginHandler),
     (r'/(.*)', DirectoryHandler, {'path': './'}),
     #(r'/', DirectoryHandler, {'path': './src/arvora/index.html'}),

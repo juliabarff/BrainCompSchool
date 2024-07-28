@@ -86,23 +86,19 @@ class Article:
     @classmethod
     def insert(cls, data):
         article = json.loads(data.decode('utf-8'))
-        print(article['title'])
-        print(article['tags'])
-        # article = {
-        #     "title": data.title,
-        #     #"autor": data.author,
-        #     "body": data.body,
-        #     "tags": data.tags
-        #     #"published": data.published
-        # }
         db.insert(article)
 
     @classmethod
-    def update(cls):
-        pass
+    def update_status(cls, title, new_status):
+        article_query = Query()
+        articles = db.search(article_query.title == title)
+        if articles:
+            db.update({'status': new_status}, article_query.title == title)
+            updated_article = db.search(article_query.title == title)[0]
+            return updated_article
+        return None
 
     @classmethod
     def delete(cls):
         pass
-
 
