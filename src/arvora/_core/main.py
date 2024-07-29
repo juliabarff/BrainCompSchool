@@ -177,41 +177,81 @@ class LoginPage(SimplePage):
                         def click(ev):
                             if ev.target.id == "cadastro":
                                 self.artigos(resultados)
+                            if ev.target.id == "dados":
+                                div_resultados = self.brython.document['loginOK']
+                                div_resultados.clear()
+
+
+
+                                nome = h.P(d.get('name'))
+                                email = d.get('email')
+                                telefone = d.get('phone')
+
+                                # titulo
+                                tit = h.P('PERFIL', Class="panel-heading", style="text-align: left;")
+
+                                # nome
+                                nam = h.I(Class="fas fa-book")
+                                name = h.SPAN(nam, Class="panel-icon")
+                                tudo2 = h.A((nam,name, nome), Class="panel-block is-active")
+
+                                # email
+                                emaI = h.I( Class="fas fa-book")
+                                ema = h.SPAN(emaI, Class="panel-icon")
+                                tudo = h.A((emaI, ema, email), Class="panel-block is-active")
+
+                                # telefone
+                                telI = h.I(Class="fas fa-book")
+                                tel = h.SPAN(telI, Class="panel-icon")
+                                tudo1 = h.A((telI, tel, telefone), Class="panel-block is-active")
+
+                                # encapsula todas as informações do perfil;
+                                col = h.NAV((tit, tudo, tudo1, tudo2), Class="panel is-success", style="width: 300px")
+                                perfil = h.DIV((col), Class="col")
+
+                                # encapsula as duas colunas
+                                row = h.DIV((perfil), Class="row align-items-start")
+                                entrada = h.DIV((row,), Class="container text-center")
+                                div_resultados <= entrada
 
                         div_resultados = self.brython.document['loginOK']
                         div_resultados.clear()
-                        #text = h.P(d.get('name'))
-                        #text1 = h.P(d.get('email'), style="margin-left: 10px;")
-                        text2 = h.P(email,  style="margin-left: 10px;")
+                        text1 = h.P("Meus dados", style="margin-left: 10px;")
 
-                        button = h.BUTTON("Login", id="cadastro", Class="button is-success is-outlined")
-                        buttonD = h.DIV(button, Class="field column is-half is-offset-one-quarter", style="width:500px;")
-                        finalh = h.DIV(buttonD, Class="columns is-mobile")
+                        #artigos para serem revisados
+                        rev = h.A('Revisar artigos', id="cadastro", Class = "has-text-dark")
+                        revD = h.A(rev, Class="field column is-half is-offset-one-quarter", style="width:200px;")
+                        revF = h.DIV(revD, Class="columns is-mobile")
+                        rev.bind("click", click)
 
-                        """# coluna 1
+                        # coluna 1
+
                         # titulo
                         tit = h.P('PERFIL', Class="panel-heading", style="text-align: left;")
 
-                        # email
+                        # meus dados
                         emaI = h.I(Class="fas fa-book")
                         ema = h.SPAN(emaI, Class="panel-icon")
-                        tudo = h.A((ema, emaI, text1), Class="panel-block is-active")
+                        tudo = h.A((ema, emaI, text1), id="dados", Class="panel-block is-active")
+                        tudo.bind("click", click)
+
 
                         # telefone
                         telI = h.I(Class="fas fa-book")
-                        tel = h.SPAN(telI, Class="panel-icon")
-                        tudo1 = h.A((tel, telI, text2), Class="panel-block is-active")
+                        tel = h.SPAN(revF, Class="panel-icon")
+                        tudo1 = h.A((tel, telI), id="cadastro",Class="panel-block is-active")
+                        tudo1.bind("click", click)
 
-                        # encapsula todas as informações do perfil
+
+                        # encapsula todas as informações do perfil;
                         col = h.NAV((tit, tudo, tudo1), Class="panel is-success", style="width: 300px")
                         perfil = h.DIV((col), Class="col")
-
+                        """
                         # coluna2
                         hel = h.DIV(("Ola, seja bem-vindo ", text), Class="col")
                         """
                         # encapsula as duas colunas
-                        button.bind("click", click)
-                        row = h.DIV((text2, finalh), Class="row align-items-start")
+                        row = h.DIV((perfil), Class="row align-items-start")
                         entrada = h.DIV((row,), Class="container text-center")
                         div_resultados <= entrada
 
@@ -701,21 +741,22 @@ class KnowledgePage(SimplePage):
             card = ""
             # Loop que mostra as páginas de rascunho
             for article in articles:
-                card_content = h.DIV((
-                    h.P(article.get("title"), Class="title is-4"),
-                    h.P(article.get("body")),
-                    h.P(article.get("tags")),
-                    h.P("data")), Class="content")
+                if article.get('status') == 'Aceito':
+                    card_content = h.DIV((
+                        h.P(article.get("title"), Class="title is-4"),
+                        h.P(article.get("body")),
+                        h.P(article.get("status")),
+                        h.P("data")), Class="content")
 
-                card_buttons = h.DIV((
-                    h.BUTTON("Comentar", Class="button is-primary"),
-                    h.BUTTON("Perguntar", Class="button is-info"),
-                    h.BUTTON("Artigos Filhos", Class="button")), Class="card-footer")
+                    card_buttons = h.DIV((
+                        h.BUTTON("Comentar", Class="button is-primary"),
+                        h.BUTTON("Perguntar", Class="button is-info"),
+                        h.BUTTON("Artigos Filhos", Class="button")), Class="card-footer")
 
-                card += h.DIV(( card_content, card_buttons), Class="box").bind("click", self.show_article)
-            post = h.DIV((card), Class="column is-half is-offset-one-quarter ")
-            posts.clear()
-            posts <= h.DIV(post, Class="columns body-columns")
+                    card += h.DIV(( card_content, card_buttons), Class="box").bind("click", self.show_article)
+                post = h.DIV((card), Class="column is-half is-offset-one-quarter ")
+                posts.clear()
+                posts <= h.DIV(post, Class="columns body-columns")
             return posts
 
         get_article()
