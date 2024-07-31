@@ -750,8 +750,8 @@ class KnowledgePage(SimplePage):
 
                     card_buttons = h.DIV((
                         h.BUTTON("Comentar", Class="button is-primary"),
-                        h.BUTTON("Perguntar", Class="button is-info"),
-                        h.BUTTON("Artigos Filhos", Class="button")), Class="card-footer")
+                        h.BUTTON("Perguntar", Class="button is-info", style="margin-left:15px;"),
+                        h.BUTTON("Artigos Relacionados", Class="button", style="margin-left:15px;")))
 
                     card += h.DIV(( card_content, card_buttons), Class="box").bind("click", self.show_article)
                 post = h.DIV((card), Class="column is-half is-offset-one-quarter ")
@@ -793,7 +793,7 @@ class Article(SimplePage):
         card_buttons = h.DIV((
             h.BUTTON("Comentar", Class="button is-primary"),
             h.BUTTON("Perguntar", Class="button is-info"),
-            h.BUTTON("Artigos Filhos", Class="button")), Class="card-footer")
+            h.BUTTON("Artigos Relacionados", Class="button")), Class="card-footer")
 
 
 
