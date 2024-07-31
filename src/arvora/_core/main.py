@@ -29,6 +29,7 @@ import browser.ajax as ajax
 from browser.local_storage import storage
 import json
 
+
 # Aqui uma base de página é criado.
 class SimplePage:
     # Essa classe tem um dicionário de páginas
@@ -114,11 +115,10 @@ class LandingPage(SimplePage):
         tt1D = h.DIV(tt1)
         tt2 = h.IMG(src="/src/arvora/_media/asset2.png", style="width: 265px;margin-top:10px")
         tt2D = h.DIV(tt2)
-        teste = h.P(('teste', storage['foo']), Class='main-text title is-3')
         # phr = phrase
         phr = h.P("Seu lugar de pesquisas de neurociência!", Class='main-text title is-3')
         # retorna uma div com todos os elementos da página
-        return h.DIV((tt1D, tt2D, phr, teste))
+        return h.DIV((tt1D, tt2D, phr))
 
 
 
@@ -159,6 +159,47 @@ class LoginPage(SimplePage):
         req.send(json.dumps(data))
 
 
+    """def status(self,data):
+        import asyncio
+        import time
+        from ably import AblyRealtime, AblyRest
+
+        async def main():
+            # conectando ably
+            # Connect to Ably with your API key
+            ably = AblyRealtime('LpWF9g.DOL7Qg:UqnSdD--SkQmbHCVb_q2gl0s4KhDF4pqdJ-2el1UZzI')
+            await ably.connection.once_async('connected')
+
+            rest = AblyRest(key='LpWF9g.DOL7Qg:UqnSdD--SkQmbHCVb_q2gl0s4KhDF4pqdJ-2el1UZzI')
+            token_request_params = {
+                'email': data.get('email'),
+            }
+
+            token_details = await rest.auth.request_token(token_params=token_request_params)
+            print(token_request_params)
+            print('Connected to Ably')
+
+            # cria o canal
+            # Create a channel called 'get-started' and register a listener to subscribe to all messages with the name 'first'
+            channel = ably.channels.get('get-started')
+
+            def listener(message):
+                print('Message received: ' + message.data)
+
+            await channel.subscribe('first', listener)
+
+            # publica mensagem em 1s
+            # Publish a message with the name 'first' and the contents 'Here is my first message!'
+            time.sleep(1)
+            await channel.publish('first', 'Here is my first message!')
+
+            # fecha a conexão com o ably depois de 5s
+            # Close the connection to Ably after a 5 second delay
+            time.sleep(5)
+            await ably.close()
+            print('Closed the connection to Ably.')
+
+        asyncio.run(main())"""
 
     def mostra_perfil(self,data=None):
 
@@ -739,8 +780,12 @@ class KnowledgePage(SimplePage):
 
         def show(articles):
             card = ""
+            but = []
+
+
             # Loop que mostra as páginas de rascunho
             for article in articles:
+
                 if article.get('status') == 'Aceito':
                     card_content = h.DIV((
                         h.P(article.get("title"), Class="title is-4"),
@@ -751,8 +796,8 @@ class KnowledgePage(SimplePage):
                     card_buttons = h.DIV((
                         h.BUTTON("Comentar", Class="button is-primary"),
                         h.BUTTON("Perguntar", Class="button is-info", style="margin-left:15px;"),
-                        h.BUTTON("Artigos Relacionados", Class="button", style="margin-left:15px;")))
-
+                        h.BUTTON("Artigos Relacionados", id="rel", Class="button", style="margin-left:15px;")))
+                    but.append(article.get('tags'))
                     card += h.DIV(( card_content, card_buttons), Class="box").bind("click", self.show_article)
                 post = h.DIV((card), Class="column is-half is-offset-one-quarter ")
                 posts.clear()
