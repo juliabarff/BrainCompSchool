@@ -30,6 +30,7 @@ import tornado.web
 from tornado.ioloop import IOLoop
 from tornado.options import define, options
 from tornado.escape import xhtml_escape
+import tornado.websocket
 
 # config options
 define('port', default=8888, type=int, help='port to run web server on')
@@ -42,6 +43,8 @@ DEBUG = options.debug
 ROUTE_TO_INDEX = options.route_to_index
 ROUTE_TO_INDEX = True
 PATH = '/'
+
+
 
 
 class DirectoryHandler(tornado.web.StaticFileHandler):
@@ -134,13 +137,43 @@ class UpdateStatusHandler(tornado.web.RequestHandler):
             self.set_status(500)
             self.write(json.dumps({'error': str(e)}))
 
+class MainPageHandler(tornado.web.RequestHandler):
+    async def get(self):
+        session_id = self.get_cookie("session_id")
+        if session_id and DS.User.is_valid_session(session_id):
+            # Renderiza uma página HTML quando o usuário está logado
+            self.render('main.html')  # Substitua por um arquivo HTML válido
+        else:
+            self.redirect('/login')
 
 class LoginHandler(tornado.web.RequestHandler):
-    def post(self):
-        data = self.request.body
-        text = DS.User.login(data)
-        self.write(json.dumps(text))
+    async def post(self):
+        form = self.request.body
+        session_id = DS.User.login(form)
 
+        self.set_header('Content-Type', 'application/json')
+
+        if session_id:
+            self.set_cookie("session_id", session_id)
+            response = json.dumps({'status': 'ok', 'session_id': session_id})
+            self.write(response)
+        else:
+            self.write(json.dumps({'status': 'error'}))
+
+class LogoutHandler(tornado.web.RequestHandler):
+    async def get(self):
+        self.clear_cookie("session_id")
+        self.write("You are logged out")
+
+
+class AuthenticatedHandler(tornado.web.RequestHandler):
+    async def prepare(self):
+        session_id = self.get_cookie("session_id")
+        if not session_id or not DS.User.is_valid_session(session_id):
+            return "ops"
+
+    def get(self):
+        self.write("You are logged in")
 class UserHandler(tornado.web.RequestHandler):
     def get(self):
          self.write(json.dumps(DS.User.load_users()))
@@ -148,6 +181,21 @@ class UserHandler(tornado.web.RequestHandler):
         data = self.request.body
         text = DS.User.create(data)
         self.write(json.dumps(text))
+
+class CheckLoginHandler(tornado.web.RequestHandler):
+    async def get(self):
+        session_id = self.get_cookie("session_id")
+        if session_id and DS.User.is_valid_session(session_id):
+            self.write(session_id)
+            print(session_id)
+        else:
+            self.write("not_logged_in")
+
+
+
+
+
+
 
 
 settings = {
@@ -161,7 +209,10 @@ application = tornado.web.Application([
     (r'/load-article', ArticleHandler),
     (r'/save-user',  UserHandler),
     (r"/update-status", UpdateStatusHandler),
+    (r"/check-login", CheckLoginHandler),
     (r'/login', LoginHandler),
+    (r"/logout", LogoutHandler),
+    (r"/protected", AuthenticatedHandler),
     (r'/(.*)', DirectoryHandler, {'path': './'}),
     #(r'/', DirectoryHandler, {'path': './src/arvora/index.html'}),
 ], **settings)

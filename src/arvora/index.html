@@ -67,7 +67,7 @@ PDX-License-Identifier:** `GNU General Public License v3.0 or later <http://is.g
 <body onload="brython({cache:'browser', static_stdlib_import:true, debug:1, pythonpath:['/src/arvora/', './_prog', './']})">
     <div id="pydiv"></div>
     <script type="text/python">
-        from browser import window, document, alert, html, timer, ajax
+        from browser import window, document, alert, html, timer, ajax, websocket, bind
         from browser.widgets.dialog import InfoDialog, Dialog
         from _core.main import main
         class Br:

@@ -107,6 +107,8 @@ class LandingPage(SimplePage):
     def __init__(self, brython, menu=MENU_OPTIONS):
         super().__init__(brython, menu, hero="main_hero")
 
+
+
     # Constroi a lading page,, essa é bem intuitiva
     def build_body(self):
 
@@ -115,6 +117,7 @@ class LandingPage(SimplePage):
         tt1D = h.DIV(tt1)
         tt2 = h.IMG(src="/src/arvora/_media/asset2.png", style="width: 265px;margin-top:10px")
         tt2D = h.DIV(tt2)
+
         # phr = phrase
         phr = h.P("Seu lugar de pesquisas de neurociência!", Class='main-text title is-3')
         # retorna uma div com todos os elementos da página
@@ -128,27 +131,88 @@ class LoginPage(SimplePage):
         # inicia o self.form, self.login e o self.passd
         #self.form = self.login = self.passd = None
 
+
+    def check_login_status(self):
+        _ = self
+        win = _.brython.window
+
+        def on_complete(req):
+            if req.status == 200:
+                response = req.text
+                self.checado(response)
+            else:
+                SimplePage.PAGES["_MAIN_"].show()
+        req = ajax.ajax()
+        req.bind('complete', on_complete)
+        req.open('GET', '/check-login', True)
+        req.send()
+
+    def checado(self, response):
+        _ = self
+        win = _.brython.window
+        ajax = _.brython.ajax
+        h = _.brython.html
+
+        def on_complete(req):
+            if req.status == 200:
+                users = json.loads(req.text)
+                email = None
+                password = None
+
+                for j in users:
+                    if j.get('session_id') == response:
+                        email = j.get('email')
+                        password = j.get("password")
+                        break
+
+                if email and password:
+                    data = {
+                        "email": email,
+                        "password": password,
+                    }
+
+                    # Verifica se o elemento 'loginOK' existe
+                    if 'loginOK' in self.brython.document:
+                        div_resultados = self.brython.document['loginOK']
+                        div_resultados.clear()
+                    else:
+                        # Cria o elemento 'loginOK' se não existir
+                        div_resultados = h.DIV("", Class="columns is-flex is-centered", id="loginOK")
+                        self.brython.document <= div_resultados
+
+                    self.mostra_perfil(data)
+                else:
+                    print("Usuário não encontrado com a sessão fornecida.")
+                    SimplePage.PAGES["_MAIN_"].show()
+            else:
+                SimplePage.PAGES["_MAIN_"].show()
+        req = ajax.ajax()
+        req.bind('complete', on_complete)
+        req.open('GET', '/save-user', True)
+        req.send()
     def write(self, data=None):
         ajax = self.brython.ajax
+
         def on_complete(req):
-            if req.status==200:
+            if req.status == 200:
                 print("complete ok: " + f'{req.status}')
-                if json.loads(req.text) == "ok":
-                    self.mostra_perfil(data)
+                try:
+                    response = json.loads(req.text)
+                    status = response.get('status')
 
-                if json.loads(req.text) == "error":
-                    div_resultados = self.brython.document['resultado']
-                    div_resultados.clear()
-                    text = self.brython.html.P('Este e-mail não esta cadastrado.')
-                    men = self.brython.html.DIV(text, Class="notification is-danger is-light")
-                    div_resultados <= men
-                if json.loads(req.text) == "!ok":
-                    div_resultados = self.brython.document['resultado']
-                    div_resultados.clear()
-                    text = self.brython.html.P('Senha incorreta.')
-                    men = self.brython.html.DIV(text, Class="notification is-danger is-light")
-                    div_resultados <= men
-
+                    if status == "ok":
+                        # O login foi bem-sucedido, pode usar a sessão
+                        self.mostra_perfil(data)
+                    elif status == "error":
+                        div_resultados = self.brython.document['resultado']
+                        div_resultados.clear()
+                        text = self.brython.html.P('Este e-mail não está cadastrado ou a senha está incorreta.')
+                        men = self.brython.html.DIV(text, Class="notification is-danger is-light")
+                        div_resultados <= men
+                    else:
+                        print("Unexpected response:", response)
+                except json.JSONDecodeError as e:
+                    print("JSON decode error:", e)
             else:
                 print("error detected: " + f'{req.status}')
 
@@ -159,47 +223,6 @@ class LoginPage(SimplePage):
         req.send(json.dumps(data))
 
 
-    """def status(self,data):
-        import asyncio
-        import time
-        from ably import AblyRealtime, AblyRest
-
-        async def main():
-            # conectando ably
-            # Connect to Ably with your API key
-            ably = AblyRealtime('LpWF9g.DOL7Qg:UqnSdD--SkQmbHCVb_q2gl0s4KhDF4pqdJ-2el1UZzI')
-            await ably.connection.once_async('connected')
-
-            rest = AblyRest(key='LpWF9g.DOL7Qg:UqnSdD--SkQmbHCVb_q2gl0s4KhDF4pqdJ-2el1UZzI')
-            token_request_params = {
-                'email': data.get('email'),
-            }
-
-            token_details = await rest.auth.request_token(token_params=token_request_params)
-            print(token_request_params)
-            print('Connected to Ably')
-
-            # cria o canal
-            # Create a channel called 'get-started' and register a listener to subscribe to all messages with the name 'first'
-            channel = ably.channels.get('get-started')
-
-            def listener(message):
-                print('Message received: ' + message.data)
-
-            await channel.subscribe('first', listener)
-
-            # publica mensagem em 1s
-            # Publish a message with the name 'first' and the contents 'Here is my first message!'
-            time.sleep(1)
-            await channel.publish('first', 'Here is my first message!')
-
-            # fecha a conexão com o ably depois de 5s
-            # Close the connection to Ably after a 5 second delay
-            time.sleep(5)
-            await ably.close()
-            print('Closed the connection to Ably.')
-
-        asyncio.run(main())"""
 
     def mostra_perfil(self,data=None):
 
@@ -209,7 +232,7 @@ class LoginPage(SimplePage):
                 resultados = json.loads(text)
                 dados1 = req1.json
                 email = data['email']
-                print(resultados)
+                print(data)
                 h = self.brython.html
                 print("1")
 
@@ -221,8 +244,6 @@ class LoginPage(SimplePage):
                             if ev.target.id == "dados":
                                 div_resultados = self.brython.document['loginOK']
                                 div_resultados.clear()
-
-
 
                                 nome = h.P(d.get('name'))
                                 email = d.get('email')
@@ -387,11 +408,13 @@ class LoginPage(SimplePage):
 
 
     def build_body(self):
+
         def click(ev):
             if ev.target.id == "cadastro":
                 SimplePage.PAGES["_CADASTRO_"].show()
 
         h = self.brython.html
+        self.check_login_status()
 
         # email
         resultado = h.DIV(id = "resultado")
@@ -435,7 +458,7 @@ class LoginPage(SimplePage):
 
 
 
-0
+
 
 class CadastroPage(SimplePage):
     def __init__(self, brython, menu=MENU_OPTIONS):
