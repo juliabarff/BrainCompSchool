@@ -239,6 +239,8 @@ class LoginPage(SimplePage):
                         def click(ev):
                             if ev.target.id == "cadastro":
                                 self.artigos(resultados)
+                            if ev.target.id == "meus_artigos":
+                                self.meus_artigos(resultados)
                             if ev.target.id == "dados":
                                 div_resultados = self.brython.document['loginOK']
                                 div_resultados.clear()
@@ -284,6 +286,12 @@ class LoginPage(SimplePage):
                         revF = h.DIV(revD, Class="columns is-mobile")
                         rev.bind("click", click)
 
+                        #meus artigos
+                        art = h.A('Meus artigos', id="meus_artigos", Class="has-text-dark")
+                        artD = h.A(art, Class="field column is-half is-offset-one-quarter", style="width:200px;")
+                        artF = h.DIV(artD, Class="columns is-mobile")
+                        art.bind("click", click)
+
                         # coluna 1
 
                         # titulo
@@ -302,9 +310,15 @@ class LoginPage(SimplePage):
                         tudo1 = h.A((tel, telI), id="cadastro",Class="panel-block is-active")
                         tudo1.bind("click", click)
 
+                        # meus artigos
+                        artI = h.I(Class="fas fa-book")
+                        artA = h.SPAN(artF, Class="panel-icon")
+                        tudo2 = h.A((artA, artI), id="meus_artigos", Class="panel-block is-active")
+                        tudo2.bind("click", click)
+
 
                         # encapsula todas as informações do perfil;
-                        col = h.NAV((tit, tudo, tudo1), Class="panel is-success", style="width: 300px")
+                        col = h.NAV((tit, tudo, tudo1, tudo2), Class="panel is-success", style="width: 300px")
                         perfil = h.DIV((col), Class="col")
                         """
                         # coluna2
@@ -395,6 +409,74 @@ class LoginPage(SimplePage):
         req.bind('complete', on_complete)
         req.open('GET', '/save-user', True)
         req.send()
+    def meus_artigos(self,resultados):
+        _ = self
+        def on_complete(req):
+            if req.status == 200:
+                response = req.text
+                self.pega_email(response,resultados)
+
+            else:
+                SimplePage.PAGES["_MAIN_"].show()
+
+        req = ajax.ajax()
+        req.bind('complete', on_complete)
+        req.open('GET', '/check-login', True)
+        req.send()
+
+    def pega_email(self, response,resultados):
+        _ = self
+        ajax = _.brython.ajax
+        h = self.brython.html
+        tor = []
+        def on_complete(req):
+            if req.status == 200:
+                users = json.loads(req.text)
+                email = None
+
+
+                for j in users:
+                    if j.get('session_id') == response:
+                        email = j.get('email')
+                        break
+
+                if email:
+                    for d in (resultados):
+                        if d.get('email') == email:
+                            title = d.get("title")
+                            body = d.get("body")
+                            tags = d.get("tags")
+                            status = d.get("status")
+
+                            tit = h.P(title, Class='title is-4')
+                            abst = h.P(body, Class='text is-6')
+                            tag = h.P(("tag: ", tags), Class="text is-6")
+                            sta = h.P(("status: ", status), Class="text is-6")
+                            ac = h.BUTTON('Editar', Class="button is-success",
+                                          style="margin-top: 5px;")
+                            rec = h.BUTTON('Deletar', Class="button is-danger",
+                                           style="margin-top: 5px; margin-left:5px;")
+
+
+                            # todos os rascunhos
+                            tor.append(h.DIV((tit, abst, tag, sta, ac, rec), Class='box'))
+
+                    div_resultados = self.brython.document['loginOK']
+                    div_resultados.clear()
+                    div_resultados <= h.DIV(tor, Class="column body-columns")
+                else:
+                    print("Usuário não encontrado com a sessão fornecida.")
+                    SimplePage.PAGES["_MAIN_"].show()
+
+            else:
+                SimplePage.PAGES["_MAIN_"].show()
+
+        req = ajax.ajax()
+        req.bind('complete', on_complete)
+        req.open('GET', '/save-user', True)
+        req.send()
+
+
 
     def artigos(self, resultados):
         h = self.brython.html
