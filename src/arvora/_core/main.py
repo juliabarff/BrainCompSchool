@@ -139,7 +139,8 @@ class LoginPage(SimplePage):
         def on_complete(req):
             if req.status == 200:
                 response = req.text
-                self.checado(response)
+                if response != "not_logged_in":
+                    self.checado(response)
             else:
                 SimplePage.PAGES["_MAIN_"].show()
         req = ajax.ajax()
@@ -232,9 +233,7 @@ class LoginPage(SimplePage):
                 resultados = json.loads(text)
                 dados1 = req1.json
                 email = data['email']
-                print(data)
                 h = self.brython.html
-                print("1")
 
                 for d in dados1:
                     if d.get('email') == email:
@@ -453,9 +452,6 @@ class LoginPage(SimplePage):
         # Aqui ele retorna a div com todos os elementos, após aplicar o bulma
         cls = h.DIV(form, Class="columns is-flex is-centered", id="loginOK")
         return cls
-
-
-
 
 
 
@@ -810,18 +806,23 @@ class KnowledgePage(SimplePage):
             for article in articles:
 
                 if article.get('status') == 'Aceito':
+                    tag = h.P(article.get("tags"))
+
                     card_content = h.DIV((
                         h.P(article.get("title"), Class="title is-4"),
                         h.P(article.get("body")),
-                        h.P(article.get("status")),
+                        tag,
                         h.P("data")), Class="content")
-
+                    bt1 = h.BUTTON("Artigos Relacionados", id="rel", Class="button", style="margin-left:15px;")
                     card_buttons = h.DIV((
                         h.BUTTON("Comentar", Class="button is-primary"),
                         h.BUTTON("Perguntar", Class="button is-info", style="margin-left:15px;"),
-                        h.BUTTON("Artigos Relacionados", id="rel", Class="button", style="margin-left:15px;")))
+                        bt1
+                        ))
                     but.append(article.get('tags'))
-                    card += h.DIV(( card_content, card_buttons), Class="box").bind("click", self.show_article)
+
+                    card += h.DIV(( card_content, card_buttons), Class="box")
+
                 post = h.DIV((card), Class="column is-half is-offset-one-quarter ")
                 posts.clear()
                 posts <= h.DIV(post, Class="columns body-columns")
@@ -901,8 +902,9 @@ class WritingPage(SimplePage):
         req.open('POST', '/save-article', True)
         req.set_header('content-type', 'application/json')
         req.send(json.dumps(data))
-    def click(self, ev=None):
 
+
+    def click(self, ev=None, emailU=None):
         _ = self
         doc = _.brython.document
         # form = doc['form'].html
@@ -910,11 +912,13 @@ class WritingPage(SimplePage):
         body = doc["body"].value
         tags = doc["tags"].value
         status = "Analise"
+        email = emailU
         data = {
             "title": title,
             "body": body,
             "tags": tags,
-            "status": status
+            "status": status,
+            "email": email
         }
 
         self.write(data)
@@ -922,9 +926,50 @@ class WritingPage(SimplePage):
         #Arvora.ARVORA.user(form.elements["username"].value)
         SimplePage.PAGES["_MAIN_"].show()
 
+    def check_login_status(self):
+        _ = self
+
+        def on_complete(req):
+            if req.status == 200:
+                response = req.text
+                self.pega_email(response)
+            else:
+                SimplePage.PAGES["_MAIN_"].show()
+
+        req = ajax.ajax()
+        req.bind('complete', on_complete)
+        req.open('GET', '/check-login', True)
+        req.send()
+
+    def pega_email(self, response):
+        _ = self
+        ajax = _.brython.ajax
+
+        def on_complete(req):
+            if req.status == 200:
+                users = json.loads(req.text)
+                email = None
+
+                for j in users:
+                    if j.get('session_id') == response:
+                        email = j.get('email')
+                        break
+
+                if email:
+                    self.click(email)
+                else:
+                    print("Usuário não encontrado com a sessão fornecida.")
+                    SimplePage.PAGES["_MAIN_"].show()
+            else:
+                SimplePage.PAGES["_MAIN_"].show()
+
+        req = ajax.ajax()
+        req.bind('complete', on_complete)
+        req.open('GET', '/save-user', True)
+        req.send()
+
     # construindo a página em si
     def build_body(self):
-
         h = self.brython.html
         # um botão para enviar o formulário
         btn1 = h.BUTTON("Enviar", Class="button is-success is-rounded mt-5 is-responsive block is-fullwidth", type="submit")
@@ -950,7 +995,6 @@ class WritingPage(SimplePage):
         # aqui eu encapsulei a div com tudo e o botão em um formulário
         btn1.bind("click", self.click)
         form = h.DIV((div, btn1, btn2), Id = 'form', Class="column")
-
         # inte == interactions. aqui eu adicionei tudo isso em outra div
         quest = h.DIV(form, Class="columns is-flex")
         # Aqui eu to retornando a div com todos os elementos
