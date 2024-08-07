@@ -160,10 +160,6 @@ class LoginHandler(tornado.web.RequestHandler):
         else:
             self.write(json.dumps({'status': 'error'}))
 
-class LogoutHandler(tornado.web.RequestHandler):
-    async def get(self):
-        self.clear_cookie("session_id")
-        self.write("You are logged out")
 
 
 class AuthenticatedHandler(tornado.web.RequestHandler):
@@ -190,9 +186,28 @@ class CheckLoginHandler(tornado.web.RequestHandler):
             print(session_id)
         else:
             self.write("not_logged_in")
+class PegaIDHandler(tornado.web.RequestHandler):
+    async def get(self):
+        session_id = self.get_cookie("session_id")
+        if session_id and DS.User.is_valid_session(session_id):
+            self.write(session_id)
+            print(session_id)
+        else:
+            self.write("not_logged_in")
 
+class LogoutHandler(tornado.web.RequestHandler):
+    def post(self):
+        # Recebe o session_id do corpo da requisição
+        data = tornado.escape.json_decode(self.request.body)
+        session_id = data.get('session_id')
 
-
+        if session_id:
+            # Remover o session_id (adicione sua lógica de remoção)
+            self.clear_cookie("session_id")
+            self.write({"status": "success"})
+        else:
+            self.set_status(400)
+            self.write({"status": "error", "message": "session_id não fornecido"})
 
 
 
@@ -210,8 +225,9 @@ application = tornado.web.Application([
     (r'/save-user',  UserHandler),
     (r"/update-status", UpdateStatusHandler),
     (r"/check-login", CheckLoginHandler),
-    (r'/login', LoginHandler),
     (r"/logout", LogoutHandler),
+    (r"/pega-id", PegaIDHandler),
+    (r'/login', LoginHandler),
     (r"/protected", AuthenticatedHandler),
     (r'/(.*)', DirectoryHandler, {'path': './'}),
     #(r'/', DirectoryHandler, {'path': './src/arvora/index.html'}),

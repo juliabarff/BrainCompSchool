@@ -26,7 +26,6 @@ Changelog
 MENU_OPTIONS = tuple(zip("PROJETO CONHECIMENTO PESQUISA PERGUNTAS LOGIN USER RASCUNHO ESCREVER ARTIGO".split(),
                          "bars-progress book book-medical question right-to-bracket user".split()))
 import browser.ajax as ajax
-from browser.local_storage import storage
 import json
 
 
@@ -316,13 +315,86 @@ class LoginPage(SimplePage):
                         entrada = h.DIV((row,), Class="container text-center")
                         div_resultados <= entrada
 
+                        # Adiciona o botão de logout
+                        logout_button = h.BUTTON("Logout", Class="button is-danger")
+                        logout_button.bind("click", self.logout)
+                        div_resultados <= logout_button
+
             except Exception as e:
                 print('erro ao processar os dados: ', e)
+
+
+
+        # Adicione
 
         def handle_first_response(req1):
             ajax.get("/load-article",headers={'Content-Type': 'application/json'}, oncomplete=lambda req2: read(req1, req2))
 
         ajax.get("/save-user", mode="json", data=json.dumps(data), oncomplete=handle_first_response)
+
+    def logout(self, ev):
+        _ = self
+        win = _.brython.window
+        print("entrou")
+        def on_complete(req):
+            if req.status == 200:
+                response = req.text
+                if response != "not_logged_in":
+                    self.remove_id(response)
+            else:
+                SimplePage.PAGES["_MAIN_"].show()
+
+        req = ajax.ajax()
+        req.bind('complete', on_complete)
+        req.open('GET', '/pega-id', True)
+        req.send()
+
+    def remove_id(self, response):
+        _ = self
+        win = _.brython.window
+        ajax = _.brython.ajax
+        h = _.brython.html
+        print("entrou1")
+        def on_complete(req):
+            print("entrou2")
+            if req.status == 200:
+                users = json.loads(req.text)
+                email = None
+                password = None
+                print('pegou',response)
+                for j in users:
+                    if j.get('session_id') == response:
+                        email = j.get('email')
+                        password = j.get("password")
+                        break
+
+                if email and password:
+                    # Enviar uma requisição para o servidor para remover o session_id
+                    def remove_session_on_complete(req):
+                        import browser
+                        if req.status == 200:
+                            print("Sessão removida com sucesso.")
+                            browser.window.location.reload()
+                        else:
+                            print("Erro ao remover a sessão.")
+                            SimplePage.PAGES["_MAIN_"].show()
+
+                    remove_req = ajax.ajax()
+                    remove_req.bind('complete', remove_session_on_complete)
+                    remove_req.open('POST', '/logout', True)
+                    remove_req.set_header('Content-Type', 'application/json')
+                    remove_req.send(json.dumps({"session_id": response}))
+
+                else:
+                    print("Usuário não encontrado com a sessão fornecida.")
+                    SimplePage.PAGES["_MAIN_"].show()
+            else:
+                SimplePage.PAGES["_MAIN_"].show()
+
+        req = ajax.ajax()
+        req.bind('complete', on_complete)
+        req.open('GET', '/save-user', True)
+        req.send()
 
     def artigos(self, resultados):
         h = self.brython.html
@@ -452,8 +524,6 @@ class LoginPage(SimplePage):
         # Aqui ele retorna a div com todos os elementos, após aplicar o bulma
         cls = h.DIV(form, Class="columns is-flex is-centered", id="loginOK")
         return cls
-
-
 
 
 class CadastroPage(SimplePage):
