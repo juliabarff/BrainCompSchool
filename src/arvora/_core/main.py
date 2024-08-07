@@ -974,15 +974,16 @@ class WritingPage(SimplePage):
         req.send(json.dumps(data))
 
 
-    def click(self, ev=None, emailU=None):
+    def click(self, ev=None):
         _ = self
         doc = _.brython.document
         # form = doc['form'].html
+
         title = doc["title"].value
         body = doc["body"].value
         tags = doc["tags"].value
         status = "Analise"
-        email = emailU
+        email = getattr(self, 'email', '')
         data = {
             "title": title,
             "body": body,
@@ -998,7 +999,7 @@ class WritingPage(SimplePage):
 
     def check_login_status(self):
         _ = self
-
+        print("entrou")
         def on_complete(req):
             if req.status == 200:
                 response = req.text
@@ -1014,7 +1015,7 @@ class WritingPage(SimplePage):
     def pega_email(self, response):
         _ = self
         ajax = _.brython.ajax
-
+        print('entrou')
         def on_complete(req):
             if req.status == 200:
                 users = json.loads(req.text)
@@ -1026,10 +1027,13 @@ class WritingPage(SimplePage):
                         break
 
                 if email:
-                    self.click(email)
+                    self.email = email  # Armazena o email na instância
+                    print(f"Email armazenado: {self.email}")  # Verifica o valor armazenado
+                    self.click()
                 else:
                     print("Usuário não encontrado com a sessão fornecida.")
                     SimplePage.PAGES["_MAIN_"].show()
+
             else:
                 SimplePage.PAGES["_MAIN_"].show()
 
@@ -1041,6 +1045,7 @@ class WritingPage(SimplePage):
     # construindo a página em si
     def build_body(self):
         h = self.brython.html
+        self.check_login_status()
         # um botão para enviar o formulário
         btn1 = h.BUTTON("Enviar", Class="button is-success is-rounded mt-5 is-responsive block is-fullwidth", type="submit")
         btn2 = h.BUTTON("Deletar", Class="button is-danger is-rounded mt-5 is-responsive block is-fullwidth", type='submit')
@@ -1069,6 +1074,7 @@ class WritingPage(SimplePage):
         quest = h.DIV(form, Class="columns is-flex")
         # Aqui eu to retornando a div com todos os elementos
         return quest
+
 
 class DraftPage(SimplePage):
 
