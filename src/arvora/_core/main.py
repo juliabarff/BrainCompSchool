@@ -837,10 +837,31 @@ class KnowledgePage(SimplePage):
         super().__init__(brython, menu, hero="main_hero")
 
     def click(self, ev=None):
+        if ev.target.id == "Writing":
+            _ = self
+            def on_complete(req):
+                h = self.brython.html
+                if req.status == 200:
+                    response = req.text
+                    if response != 'not_logged_in':
+                        SimplePage.PAGES["_ESCREVER_"].show()
+
+                    else:
+                        div_resultados = self.brython.document['loginOK']
+                        div_resultados.clear()
+                        text1 = h.P("Você precisa estar logado para escrever.", style="margin-left: 10px;")
+                        row = h.DIV((text1), Class="row align-items-start")
+                        entrada = h.DIV((row,), Class="container text-center")
+                        div_resultados <= entrada
+
+            req = ajax.ajax()
+            req.bind('complete', on_complete)
+            req.open('GET', '/check-login', True)
+            req.send()
+
         if ev.target.id == "Draft":
             SimplePage.PAGES["_RASCUNHO_"].show()
-        elif ev.target.id == "Writing":
-            SimplePage.PAGES["_ESCREVER_"].show()
+
     def show_article(ev):
         SimplePage.PAGES["_ARTIGO_"].show()
 
@@ -908,7 +929,7 @@ class KnowledgePage(SimplePage):
         side_tab.bind("click", self.click)
 
 
-        wrapper = h.DIV((side_tab, posts))
+        wrapper = h.DIV((side_tab, posts), id="loginOK")
         return wrapper
 
 
@@ -977,33 +998,33 @@ class WritingPage(SimplePage):
     def click(self, ev=None):
         _ = self
         doc = _.brython.document
+        h = self.brython.html
         # form = doc['form'].html
-
+        email = getattr(self, 'email', '')
         title = doc["title"].value
         body = doc["body"].value
         tags = doc["tags"].value
         status = "Analise"
-        email = getattr(self, 'email', '')
         data = {
             "title": title,
             "body": body,
             "tags": tags,
             "status": status,
             "email": email
-        }
+         }
 
         self.write(data)
-        # USER_OPTIONS = form.elements["username"].value
-        #Arvora.ARVORA.user(form.elements["username"].value)
+            # USER_OPTIONS = form.elements["username"].value
+            #Arvora.ARVORA.user(form.elements["username"].value)
         SimplePage.PAGES["_MAIN_"].show()
 
     def check_login_status(self):
         _ = self
-        print("entrou")
         def on_complete(req):
             if req.status == 200:
                 response = req.text
                 self.pega_email(response)
+
             else:
                 SimplePage.PAGES["_MAIN_"].show()
 
@@ -1015,11 +1036,11 @@ class WritingPage(SimplePage):
     def pega_email(self, response):
         _ = self
         ajax = _.brython.ajax
-        print('entrou')
         def on_complete(req):
             if req.status == 200:
                 users = json.loads(req.text)
                 email = None
+
 
                 for j in users:
                     if j.get('session_id') == response:
@@ -1027,9 +1048,9 @@ class WritingPage(SimplePage):
                         break
 
                 if email:
-                    self.email = email  # Armazena o email na instância
-                    print(f"Email armazenado: {self.email}")  # Verifica o valor armazenado
-                    self.click()
+                   self.email = email  # Armazena o email na instância
+                   print(f"Email armazenado: {self.email}")  # Verifica o valor armazenado
+                   self.click()
                 else:
                     print("Usuário não encontrado com a sessão fornecida.")
                     SimplePage.PAGES["_MAIN_"].show()
@@ -1071,7 +1092,7 @@ class WritingPage(SimplePage):
         btn1.bind("click", self.click)
         form = h.DIV((div, btn1, btn2), Id = 'form', Class="column")
         # inte == interactions. aqui eu adicionei tudo isso em outra div
-        quest = h.DIV(form, Class="columns is-flex")
+        quest = h.DIV(form, Class="columns is-flex", id="loginOK")
         # Aqui eu to retornando a div com todos os elementos
         return quest
 
