@@ -242,6 +242,8 @@ class LoginPage(SimplePage):
                             if ev.target.id == "meus_artigos":
                                 self.meus_artigos(resultados)
                             if ev.target.id == "dados":
+                                self.meus_dados()
+                            """if ev.target.id == "dados":
                                 div_resultados = self.brython.document['loginOK']
                                 div_resultados.clear()
 
@@ -274,7 +276,7 @@ class LoginPage(SimplePage):
                                 # encapsula as duas colunas
                                 row = h.DIV((perfil), Class="row align-items-start")
                                 entrada = h.DIV((row,), Class="container text-center")
-                                div_resultados <= entrada
+                                div_resultados <= entrada"""
 
                         div_resultados = self.brython.document['loginOK']
                         div_resultados.clear()
@@ -409,6 +411,96 @@ class LoginPage(SimplePage):
         req.bind('complete', on_complete)
         req.open('GET', '/save-user', True)
         req.send()
+
+    def meus_dados(self):
+        _ = self
+        def on_complete(req):
+            if req.status == 200:
+                response = req.text
+                self.exibir_dados(response)
+                print('foiiiiiiiiiiiiii')
+
+            else:
+                SimplePage.PAGES["_MAIN_"].show()
+
+        req = ajax.ajax()
+        req.bind('complete', on_complete)
+        req.open('GET', '/check-login', True)
+        req.send()
+    def exibir_dados(self,response):
+        _ = self
+        ajax = _.brython.ajax
+        h = self.brython.html
+        tor = []
+
+        def on_complete(req):
+            if req.status == 200:
+                users = json.loads(req.text)
+                email = None
+
+                for j in users:
+                    if j.get('session_id') == response:
+                        email = j.get('email')
+                        break
+
+                if email:
+                    for d in (users):
+                        if d.get('email') == email:
+                            title = d.get("name")
+                            body = d.get("email")
+                            tags = d.get("phone")
+
+                            div_resultados = self.brython.document['loginOK']
+                            div_resultados.clear()
+                            text1 = h.P(title, style="margin-left: 10px;")
+                            text2 = h.P(body, style="margin-left: 10px;")
+                            text3 = h.P(tags, style="margin-left: 10px;")
+
+
+                            # coluna 1
+
+                            # titulo
+                            tit = h.P('Meus dados', Class="panel-heading", style="text-align: left;")
+
+                            # meus dados
+                            emaI = h.I(Class="fas fa-book")
+                            ema = h.SPAN(emaI, Class="panel-icon")
+                            tudo = h.A((ema, emaI, text1), id="dados", Class="panel-block is-active")
+
+                            # telefone
+                            telI = h.I(Class="fas fa-book")
+                            tel = h.SPAN(Class="panel-icon")
+                            tudo1 = h.A((tel, telI,text2), id="cadastro", Class="panel-block is-active")
+
+                            # meus artigos
+                            artI = h.I(Class="fas fa-book")
+                            artA = h.SPAN(Class="panel-icon")
+                            tudo2 = h.A((artA, artI,text3), id="meus_artigos", Class="panel-block is-active")
+
+                            # encapsula todas as informações do perfil;
+                            col = h.NAV((tit, tudo, tudo1, tudo2), Class="panel is-success", style="width: 300px")
+                            perfil = h.DIV((col), Class="col")
+                            """
+                            # coluna2
+                            hel = h.DIV(("Ola, seja bem-vindo ", text), Class="col")
+                            """
+                            # encapsula as duas colunas
+                            row = h.DIV((perfil), Class="row align-items-start")
+                            entrada = h.DIV((row,), Class="container text-center")
+                            div_resultados <= entrada
+
+                else:
+                    print("Usuário não encontrado com a sessão fornecida.")
+                    SimplePage.PAGES["_MAIN_"].show()
+
+            else:
+                SimplePage.PAGES["_MAIN_"].show()
+
+        req = ajax.ajax()
+        req.bind('complete', on_complete)
+        req.open('GET', '/save-user', True)
+        req.send()
+
     def meus_artigos(self,resultados):
         _ = self
         def on_complete(req):
