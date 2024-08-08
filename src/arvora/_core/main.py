@@ -701,7 +701,7 @@ class LoginPage(SimplePage):
                 '/update-status',
                 mode='json',
                 headers={'Content-Type': 'application/json'},
-                data=json.dumps({'title': title, 'status': status}),
+                data=json.dumps({'title': title, 'status': status, "comentario": comentario}),
                 oncomplete=lambda req: print(f"Status do artigo {title} atualizado para {status}")
             )
 
@@ -1286,23 +1286,27 @@ class WritingPage(SimplePage):
         _ = self
         doc = _.brython.document
         h = self.brython.html
+        import browser
         # form = doc['form'].html
         email = getattr(self, 'email', '')
         title = doc["title"].value
         body = doc["body"].value
         tags = doc["tags"].value
         status = "Analise"
+        comentario = ""
         data = {
             "title": title,
             "body": body,
             "tags": tags,
             "status": status,
-            "email": email
+            "email": email,
+            "comentario": comentario
          }
 
         self.write(data)
             # USER_OPTIONS = form.elements["username"].value
             #Arvora.ARVORA.user(form.elements["username"].value)
+        browser.window.location.reload()
         SimplePage.PAGES["_MAIN_"].show()
 
     def check_login_status(self):

@@ -127,6 +127,7 @@ class Article:
     @classmethod
     def insert(cls, data):
         article = json.loads(data.decode('utf-8'))
+
         db.insert(article)
 
     @classmethod
