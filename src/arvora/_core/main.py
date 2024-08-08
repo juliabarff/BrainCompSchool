@@ -163,6 +163,7 @@ class LoginPage(SimplePage):
                     if j.get('session_id') == response:
                         email = j.get('email')
                         password = j.get("password")
+                        user = j.get("user")
                         break
 
                 if email and password:
@@ -180,7 +181,13 @@ class LoginPage(SimplePage):
                         div_resultados = h.DIV("", Class="columns is-flex is-centered", id="loginOK")
                         self.brython.document <= div_resultados
 
-                    self.mostra_perfil(data)
+                    if user == "2":
+                        print("usuario 2")
+                        self.mostra_perfil(data)
+                    else:
+                        print("usuario1")
+                        self.mostra_perfilU(data)
+
                 else:
                     print("Usuário não encontrado com a sessão fornecida.")
                     SimplePage.PAGES["_MAIN_"].show()
@@ -199,6 +206,7 @@ class LoginPage(SimplePage):
                 try:
                     response = json.loads(req.text)
                     status = response.get('status')
+                    email = response.get('email')
 
                     if status == "ok":
                         def on_complete(req):
@@ -206,12 +214,14 @@ class LoginPage(SimplePage):
                                 users = json.loads(req.text)
 
                                 for d in users:
-                                    if d.get("user") == "2":
-                                        self.mostra_perfil(data)
-                                        break
-                                    else:
-                                        self.mostra_perfil(data)
-                                        print("omg")
+                                    if d.get('email') == email:
+                                        user = d.get("user")
+                                        if user == "2":
+                                            print("usuario 2")
+                                            self.mostra_perfil(data)
+                                        else:
+                                            print("usuario1")
+                                            self.mostra_perfilU(data)
 
 
                             else:
@@ -240,6 +250,7 @@ class LoginPage(SimplePage):
         req.open('POST', '/login', True)
         req.set_header('content-type', 'application/json')
         req.send(json.dumps(data))
+
 
 
 
@@ -367,6 +378,87 @@ class LoginPage(SimplePage):
 
         ajax.get("/save-user", mode="json", data=json.dumps(data), oncomplete=handle_first_response)
 
+# perfil do usuario comum
+
+    def mostra_perfilU(self,data=None):
+
+        def read(req1, req2):
+            text = req2.text
+            try:
+                resultados = json.loads(text)
+                dados1 = req1.json
+                email = data['email']
+                h = self.brython.html
+
+                for d in dados1:
+                    if d.get('email') == email:
+                        def click(ev):
+                            if ev.target.id == "meus_artigos":
+                                self.meus_artigos(resultados)
+                            if ev.target.id == "dados":
+                                self.meus_dados()
+
+                        div_resultados = self.brython.document['loginOK']
+                        div_resultados.clear()
+                        text1 = h.P("Meus dados", style="margin-left: 10px;")
+
+
+                        #meus artigos
+                        art = h.A('Meus artigos', id="meus_artigos", Class="has-text-dark")
+                        artD = h.A(art, Class="field column is-half is-offset-one-quarter", style="width:200px;")
+                        artF = h.DIV(artD, Class="columns is-mobile")
+                        art.bind("click", click)
+
+                        # coluna 1
+
+                        # titulo
+                        tit = h.P('PERFIL', Class="panel-heading", style="text-align: left;")
+
+                        # meus dados
+                        emaI = h.I(Class="fas fa-book")
+                        ema = h.SPAN(emaI, Class="panel-icon")
+                        tudo = h.A((ema, emaI, text1), id="dados", Class="panel-block is-active")
+                        tudo.bind("click", click)
+
+
+
+                        # meus artigos
+                        artI = h.I(Class="fas fa-book")
+                        artA = h.SPAN(artF, Class="panel-icon")
+                        tudo2 = h.A((artA, artI), id="meus_artigos", Class="panel-block is-active")
+                        tudo2.bind("click", click)
+
+
+                        # encapsula todas as informações do perfil;
+                        col = h.NAV((tit, tudo, tudo2), Class="panel is-success", style="width: 300px")
+                        perfil = h.DIV((col), Class="col")
+                        """
+                        # coluna2
+                        hel = h.DIV(("Ola, seja bem-vindo ", text), Class="col")
+                        """
+                        # encapsula as duas colunas
+                        row = h.DIV((perfil), Class="row align-items-start")
+                        entrada = h.DIV((row,), Class="container text-center")
+                        div_resultados <= entrada
+
+                        # Adiciona o botão de logout
+                        logout_button = h.BUTTON("Logout", Class="button is-danger")
+                        logout_button.bind("click", self.logout)
+                        div_resultados <= logout_button
+
+            except Exception as e:
+                print('erro ao processar os dados: ', e)
+
+
+
+        # Adicione
+
+        def handle_first_response(req1):
+            ajax.get("/load-article",headers={'Content-Type': 'application/json'}, oncomplete=lambda req2: read(req1, req2))
+
+        ajax.get("/save-user", mode="json", data=json.dumps(data), oncomplete=handle_first_response)
+
+
     def logout(self, ev):
         _ = self
         win = _.brython.window
@@ -436,7 +528,6 @@ class LoginPage(SimplePage):
             if req.status == 200:
                 response = req.text
                 self.exibir_dados(response)
-                print('foiiiiiiiiiiiiii')
 
             else:
                 SimplePage.PAGES["_MAIN_"].show()
@@ -716,6 +807,7 @@ class LoginPage(SimplePage):
         # Aqui ele retorna a div com todos os elementos, após aplicar o bulma
         cls = h.DIV(form, Class="columns is-flex is-centered", id="loginOK")
         return cls
+
 
 
 class CadastroPage(SimplePage):
