@@ -201,8 +201,27 @@ class LoginPage(SimplePage):
                     status = response.get('status')
 
                     if status == "ok":
+                        def on_complete(req):
+                            if req.status == 200:
+                                users = json.loads(req.text)
+
+                                for d in users:
+                                    if d.get("user") == "2":
+                                        self.mostra_perfil(data)
+                                        break
+                                    else:
+                                        self.mostra_perfil(data)
+                                        print("omg")
+
+
+                            else:
+                                SimplePage.PAGES["_MAIN_"].show()
+
+                        req = ajax.ajax()
+                        req.bind('complete', on_complete)
+                        req.open('GET', '/save-user', True)
+                        req.send()
                         # O login foi bem-sucedido, pode usar a sessão
-                        self.mostra_perfil(data)
                     elif status == "error":
                         div_resultados = self.brython.document['resultado']
                         div_resultados.clear()
@@ -351,7 +370,6 @@ class LoginPage(SimplePage):
     def logout(self, ev):
         _ = self
         win = _.brython.window
-        print("entrou")
         def on_complete(req):
             if req.status == 200:
                 response = req.text
@@ -1223,7 +1241,6 @@ class WritingPage(SimplePage):
 
                 if email:
                    self.email = email  # Armazena o email na instância
-                   print(f"Email armazenado: {self.email}")  # Verifica o valor armazenado
                    self.click()
                 else:
                     print("Usuário não encontrado com a sessão fornecida.")

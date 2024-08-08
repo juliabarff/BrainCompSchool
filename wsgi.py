@@ -150,12 +150,13 @@ class LoginHandler(tornado.web.RequestHandler):
     async def post(self):
         form = self.request.body
         session_id = DS.User.login(form)
-
+        data = json.loads(self.request.body)
+        email = data.get('email')
         self.set_header('Content-Type', 'application/json')
 
         if session_id:
             self.set_cookie("session_id", session_id)
-            response = json.dumps({'status': 'ok', 'session_id': session_id})
+            response = json.dumps({'status': 'ok', 'session_id': session_id, 'email': email})
             self.write(response)
         else:
             self.write(json.dumps({'status': 'error'}))
