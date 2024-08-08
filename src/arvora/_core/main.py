@@ -682,17 +682,20 @@ class LoginPage(SimplePage):
     def artigos(self, resultados):
         h = self.brython.html
         tor = []
+        w = self.brython.window
         # Loop que mostra os resultados da pesquisa
 
         def atualizar_status(ev):
             button = ev.target
             status = button.text
+            print(status)
             div_box = button.closest('.box')
             status_p = div_box.select('p')[3]  # Assume que o 4º parágrafo é o status
             status_p.text = f"status: {status.lower()}"
 
             title = div_box.select('p')[0].text  # Assume que o 1º parágrafo é o título
-
+            if status == "Recusado":
+                comentario = w.prompt(f"Por favor, explique o motivo da recusa deste artigo.")
             # Enviar a atualização para o servidor
             ajax.post(
                 '/update-status',
@@ -701,9 +704,6 @@ class LoginPage(SimplePage):
                 data=json.dumps({'title': title, 'status': status}),
                 oncomplete=lambda req: print(f"Status do artigo {title} atualizado para {status}")
             )
-
-            # Enviar a atualização para o servidor
-
 
 
         for i,d in enumerate(resultados):
@@ -823,12 +823,15 @@ class CadastroPage(SimplePage):
         email = doc["email"].value
         phone = doc["phone"].value
         password = doc["password"].value
+        user = "1"
 
         data = {
             "name": name,
             "email": email,
             "phone": phone,
             "password": password,
+            "user": user,
+            "comentario": ""
         }
 
         def on_complete(req):
