@@ -683,6 +683,7 @@ class LoginPage(SimplePage):
         h = self.brython.html
         tor = []
         w = self.brython.window
+        import browser
         # Loop que mostra os resultados da pesquisa
 
         def atualizar_status(ev):
@@ -696,12 +697,15 @@ class LoginPage(SimplePage):
             title = div_box.select('p')[0].text  # Assume que o 1º parágrafo é o título
             if status == "Recusado":
                 comentario = w.prompt(f"Por favor, explique o motivo da recusa deste artigo.")
+
+            browser.window.location.reload()
+
             # Enviar a atualização para o servidor
             ajax.post(
                 '/update-status',
                 mode='json',
                 headers={'Content-Type': 'application/json'},
-                data=json.dumps({'title': title, 'status': status, "comentario": comentario}),
+                data=json.dumps({'title': title, 'status': status}),
                 oncomplete=lambda req: print(f"Status do artigo {title} atualizado para {status}")
             )
 
