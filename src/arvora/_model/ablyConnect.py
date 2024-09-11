@@ -38,34 +38,4 @@ async def main():
 
 asyncio.run(main())
 
-"""
-rest = AblyRest(key='xVLyHw.n0e_Dg:TuH_8e3L2GvCnkqyvnribF2PLDgBf-uBClsUmJjes0w')
-token_request_data = {
-    'clientId': 'client@example.com',
-}
 
-
-token_details = await rest.auth.request_token(token_params=token_request_data)
-
-
-header = {
-    "typ": "JWT",
-    "alg": "HS256",
-    "x-ably-token": token_details.token
-}
-claims = {
-    "exp": int(time.time()) + 3600
-}
-
-
-base64_header = base64.urlsafe_b64encode(bytes(json.dumps(header), 'utf-8')).decode('utf-8')
-base64_claims = base64.urlsafe_b64encode(bytes(json.dumps(claims), 'utf-8')).decode('utf-8')
-
-
-signature = hashlib.sha256((base64_header + "." + base64_claims + "{{API_KEY_SECRET}}").encode('utf-8')).digest()
-signature_base64 = base64.urlsafe_b64encode(signature).decode('utf-8')
-
-
-jwt_token = base64_header + "." + base64_claims + "." + signature_base64
-
-"""

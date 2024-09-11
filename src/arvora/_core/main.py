@@ -103,9 +103,9 @@ class SimplePage:
 
 class LandingPage(SimplePage):
     # Inicia os atributos da classe
+    
     def __init__(self, brython, menu=MENU_OPTIONS):
         super().__init__(brython, menu, hero="main_hero")
-
 
 
     # Constroi a lading page,, essa é bem intuitiva
@@ -114,11 +114,11 @@ class LandingPage(SimplePage):
         h = self.brython.html
         tt1 = h.IMG(src="/src/arvora/_media/arvora_logo.png", style="width: 465px;")
         tt1D = h.DIV(tt1)
-        tt2 = h.IMG(src="/src/arvora/_media/asset2.png", style="width: 265px;margin-top:10px")
+        tt2 = h.IMG(src="/src/arvora/_media/asset2.png", style="width: 350px; margin-top:20px; margin-left:15px")
         tt2D = h.DIV(tt2)
 
         # phr = phrase
-        phr = h.P("Seu lugar de pesquisas de neurociência!", Class='main-text title is-3')
+        phr = h.P("Seu lugar de pesquisas de neurociência!", Class='main-text has-text-grey-dark is-3')
         # retorna uma div com todos os elementos da página
         return h.DIV((tt1D, tt2D, phr))
 
@@ -192,12 +192,12 @@ class LoginPage(SimplePage):
                     }
 
                     # Verifica se o elemento 'loginOK' existe
-                    if 'loginOK' in self.brython.document:
-                        div_resultados = self.brython.document['loginOK']
+                    if 'loginC' in self.brython.document:
+                        div_resultados = self.brython.document['loginC']
                         div_resultados.clear()
                     else:
                         # Cria o elemento 'loginOK' se não existir
-                        div_resultados = h.DIV("", Class="columns is-flex is-centered", id="loginOK")
+                        div_resultados = h.DIV("", Class="columns is-flex is-centered", id="loginC")
                         self.brython.document <= div_resultados
 
                     if user == "2":
@@ -290,46 +290,11 @@ class LoginPage(SimplePage):
                                 self.meus_artigos(resultados)
                             if ev.target.id == "dados":
                                 self.meus_dados()
-                            """if ev.target.id == "dados":
-                                div_resultados = self.brython.document['loginOK']
-                                div_resultados.clear()
 
-                                nome = h.P(d.get('name'))
-                                email = d.get('email')
-                                telefone = d.get('phone')
-
-                                # titulo
-                                tit = h.P('PERFIL', Class="panel-heading", style="text-align: left;")
-
-                                # nome
-                                nam = h.I(Class="fas fa-book")
-                                name = h.SPAN(nam, Class="panel-icon")
-                                tudo2 = h.A((nam,name, nome), Class="panel-block is-active")
-
-                                # email
-                                emaI = h.I( Class="fas fa-book")
-                                ema = h.SPAN(emaI, Class="panel-icon")
-                                tudo = h.A((emaI, ema, email), Class="panel-block is-active")
-
-                                # telefone
-                                telI = h.I(Class="fas fa-book")
-                                tel = h.SPAN(telI, Class="panel-icon")
-                                tudo1 = h.A((telI, tel, telefone), Class="panel-block is-active")
-
-                                # encapsula todas as informações do perfil;
-                                col = h.NAV((tit, tudo, tudo1, tudo2), Class="panel is-success", style="width: 300px")
-                                perfil = h.DIV((col), Class="col")
-
-                                # encapsula as duas colunas
-                                row = h.DIV((perfil), Class="row align-items-start")
-                                entrada = h.DIV((row,), Class="container text-center")
-                                div_resultados <= entrada"""
-
-                        div_resultados = self.brython.document['loginOK']
+                        div_resultados = self.brython.document['loginC']
                         div_resultados.clear()
                         text1 = h.P("Meus dados", style="margin-left: 10px;")
                         textA = h.P("Meus artigos", style="margin-left: 10px;")
-
 
 
 
@@ -360,19 +325,22 @@ class LoginPage(SimplePage):
 
 
                         # encapsula todas as informações do perfil;
-                        col = h.NAV((tit, tudo, tudo2), Class="panel is-success", style="width: 300px")
+                        col = h.NAV((tit, tudo, tudo2), Class="panel is-success", style="width: 300px;;")
                         perfil = h.DIV((col), Class="col")
-                        """
-                        # coluna2
-                        hel = h.DIV(("Ola, seja bem-vindo ", text), Class="col")
-                        """
+
                         # encapsula as duas colunas
                         row = h.DIV((perfil), Class="row align-items-start")
-                        entrada = h.DIV((row,), Class="container text-center")
+                        entrada = h.DIV((row), Class="container text-center")
                         div_resultados <= entrada
 
+
+                        # coluna2
+                        #hel = h.DIV(("Ola, seja bem-vindo "), Class="col")
+                        entrada1 = h.DIV( Class="container text-center", id="perfil")
+                        div_resultados <= entrada1
+
                         # Adiciona o botão de logout
-                        logout_button = h.BUTTON("Logout", Class="button is-danger")
+                        logout_button = h.BUTTON("Logout", Class="button is-danger", style="margin-right: 10px;")
                         logout_button.bind("click", self.logout)
                         div_resultados <= logout_button
 
@@ -408,7 +376,7 @@ class LoginPage(SimplePage):
                             if ev.target.id == "dados":
                                 self.meus_dados()
 
-                        div_resultados = self.brython.document['loginOK']
+                        div_resultados = self.brython.document['loginC']
                         div_resultados.clear()
                         text1 = h.P("Meus dados", style="margin-left: 10px;")
 
@@ -440,12 +408,12 @@ class LoginPage(SimplePage):
 
 
                         # encapsula todas as informações do perfil;
-                        col = h.NAV((tit, tudo, tudo2), Class="panel is-success", style="width: 300px")
+                        col = h.NAV((tit, tudo, tudo2), Class="panel is-success", style="width: 400px")
                         perfil = h.DIV((col), Class="col")
-                        """
+
                         # coluna2
-                        hel = h.DIV(("Ola, seja bem-vindo ", text), Class="col")
-                        """
+
+
                         # encapsula as duas colunas
                         row = h.DIV((perfil), Class="row align-items-start")
                         entrada = h.DIV((row,), Class="container text-center")
@@ -569,7 +537,7 @@ class LoginPage(SimplePage):
                             body = d.get("email")
                             tags = d.get("phone")
 
-                            div_resultados = self.brython.document['loginOK']
+                            div_resultados = self.brython.document['perfil']
                             div_resultados.clear()
                             text1 = h.P(title, style="margin-left: 10px;")
                             text2 = h.P(body, style="margin-left: 10px;")
@@ -597,7 +565,7 @@ class LoginPage(SimplePage):
                             tudo2 = h.A((artA, artI,text3), id="meus_artigos", Class="panel-block is-active")
 
                             # encapsula todas as informações do perfil;
-                            col = h.NAV((tit, tudo, tudo1, tudo2), Class="panel is-success", style="width: 300px")
+                            col = h.NAV((tit, tudo, tudo1, tudo2), Class="panel is-success", style="width: 500px;")
                             perfil = h.DIV((col), Class="col")
                             """
                             # coluna2
@@ -680,7 +648,7 @@ class LoginPage(SimplePage):
                             # todos os rascunhos
                             tor.append(h.DIV((tit, abst, tag, sta,com, ac, rec), Class='box'))
 
-                    div_resultados = self.brython.document['loginOK']
+                    div_resultados = self.brython.document['perfil']
                     div_resultados.clear()
                     div_resultados <= h.DIV(tor, Class="column body-columns")
                 else:
@@ -723,7 +691,7 @@ class LoginPage(SimplePage):
                 '/update-status',
                 mode='json',
                 headers={'Content-Type': 'application/json'},
-                data=json.dumps({'title': title, 'status': status}),
+                data=json.dumps({'title': title, 'status': status, "comentario": comentario}),
                 oncomplete=lambda req: print(f"Status do artigo {title} atualizado para {status}")
             )
 
@@ -758,7 +726,7 @@ class LoginPage(SimplePage):
                 # todos os rascunhos
                 tor.append(h.DIV((tit, abst, tag,sta,com, ac, rec), Class='box'))
 
-        div_resultados = self.brython.document['loginOK']
+        div_resultados = self.brython.document['loginC']
         div_resultados.clear()
         div_resultados <= h.DIV(tor, Class="column body-columns")
 
@@ -837,7 +805,7 @@ class LoginPage(SimplePage):
         button.bind("click", self.click)
 
         # Aqui ele retorna a div com todos os elementos, após aplicar o bulma
-        cls = h.DIV(form, Class="columns is-flex is-centered", id="loginOK")
+        cls = h.DIV(form, Class="columns is-flex is-centered", id="loginC")
         return cls
 
 
@@ -1519,7 +1487,7 @@ class Arvora:
         #Separando os usuários entre admin e user
         self.users = dict(ADMIN="admin", USER="user")
         self.brython = br
-        self.current_user = "JUlia"
+        self.current_user = ""
         Arvora.ARVORA = self
 
     #Criando a função do usuário atual
