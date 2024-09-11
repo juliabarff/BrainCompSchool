@@ -390,7 +390,7 @@ class LoginPage(SimplePage):
                         # coluna 1
 
                         # titulo
-                        tit = h.P('PERFIL', Class="panel-heading", style="text-align: left;")
+                        tit = h.P('PE', Class="panel-heading", style="text-align: left;")
 
                         # meus dados
                         emaI = h.I(Class="fas fa-book")
@@ -565,7 +565,7 @@ class LoginPage(SimplePage):
                             tudo2 = h.A((artA, artI,text3), id="meus_artigos", Class="panel-block is-active")
 
                             # encapsula todas as informações do perfil;
-                            col = h.NAV((tit, tudo, tudo1, tudo2), Class="panel is-success", style="width: 500px;")
+                            col = h.NAV((tit, tudo, tudo1, tudo2), Class="panel is-success", style="width: 500px;", id="panel-dados")
                             perfil = h.DIV((col), Class="col")
                             """
                             # coluna2
