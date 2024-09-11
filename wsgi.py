@@ -209,6 +209,44 @@ class LogoutHandler(tornado.web.RequestHandler):
         else:
             self.set_status(400)
             self.write({"status": "error", "message": "session_id não fornecido"})
+class AddCommentHandler(tornado.web.RequestHandler):
+    def post(self):
+        try:
+            # Obtém os dados da requisição
+            data = json.loads(self.request.body.decode('utf-8'))
+            titulo = data.get('titulo')
+            comentario = data.get('comentario')
+
+            if not titulo or not comentario:
+                self.set_status(400)
+                self.write({"error": "Título e comentário são obrigatórios."})
+                return
+
+            # Busca o artigo pelo título
+            article_query = DS.Query()
+            artigo = DS.db.search(article_query.title == titulo)
+
+            if not artigo:
+                self.set_status(404)
+                self.write({"error": "Artigo não encontrado."})
+                return
+
+            # Adiciona o comentário ao artigo
+            artigo = artigo[0]
+            if 'comments' not in artigo:
+                artigo['comments'] = []
+
+            artigo['comments'].append(comentario)
+
+            # Atualiza o artigo no banco de dados
+            DS.db.update({'comments': artigo['comments']}, article_query.title == titulo)
+
+            # Responde com sucesso
+            self.write({"status": "Comentário adicionado com sucesso."})
+
+        except Exception as e:
+            self.set_status(500)
+            self.write({"error": str(e)})
 
 
 
@@ -226,6 +264,7 @@ application = tornado.web.Application([
     (r'/save-user',  UserHandler),
     (r"/update-status", UpdateStatusHandler),
     (r"/check-login", CheckLoginHandler),
+    (r"/adicionar-comentario", AddCommentHandler),
     (r"/logout", LogoutHandler),
     (r"/pega-id", PegaIDHandler),
     (r'/login', LoginHandler),

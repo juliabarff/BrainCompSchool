@@ -140,6 +140,26 @@ class Article:
         return None
 
     @classmethod
+    def add_comment(cls, title, comment):
+        article_query = Query()
+        articles = db.search(article_query.title == title)
+        if articles:
+            article = articles[0]
+
+            # Verifica se o campo 'comments' existe; se não, cria-o como uma lista vazia
+            if 'comments' not in article:
+                article['comments'] = []
+
+            # Adiciona o novo comentário à lista de comentários
+            article['comments'].append(comment)
+
+            # Atualiza o artigo no banco de dados
+            db.update({'comments': article['comments']}, article_query.title == title)
+
+            return article
+        return None
+
+    @classmethod
     def delete(cls):
         pass
 

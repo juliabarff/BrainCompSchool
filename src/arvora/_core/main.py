@@ -86,11 +86,11 @@ class SimplePage:
 
         def do_item(title=None, icon=None):
             spn = h.SPAN(
-                h.I(Class=f"fa fa-lg fa-{icon}", Id=f"-_{title}_-") + h.SPAN(title, Id=f"_{title}_-"),
-                Class="icon-text", style="color: #333;", Id=f"-_{title}_--")
+                h.I(Class=f"fa fa-lg fa-{icon}", Id=f"-_{title}_-", style="margin-right:5px;") + h.SPAN(title, Id=f"_{title}_-"),
+                Class="icon-text", style="color: white;", Id=f"-_{title}_--")
             return h.A(spn, Id=f"_{title}_", Class="navbar-item", href="./#")
 
-        aim = h.IMG(src="/src/arvora/_media/arvora_logo.png", alt="Arvora", height="28", Id="_MAIN_-")
+        aim = h.IMG(src="/src/arvora/_media/asset3.png", alt="Arvora", height="28", Id="_MAIN_-")
         arv = h.A(aim, Id="_MAIN_", Class="navbar-item", href="./")
         nbr = h.DIV(arv, Class="navbar-brand", Id="-_MAIN_-")
         self.items = [do_item(**item) for item in menu]
@@ -122,6 +122,26 @@ class LandingPage(SimplePage):
         # retorna uma div com todos os elementos da página
         return h.DIV((tt1D, tt2D, phr))
 
+class UserPage(SimplePage):
+    # Inicia os atributos da classe
+    def __init__(self, brython, menu=MENU_OPTIONS):
+        super().__init__(brython, menu, hero="main_hero")
+
+
+
+    # Constroi a lading page,, essa é bem intuitiva
+    def build_body(self):
+
+        h = self.brython.html
+        tt1 = h.IMG(src="/src/arvora/_media/arvora_logo.png", style="width: 465px;")
+        tt1D = h.DIV(tt1)
+        tt2 = h.IMG(src="/src/arvora/_media/asset2.png", style="width: 265px;margin-top:10px")
+        tt2D = h.DIV(tt2)
+
+        # phr = phrase
+        phr = h.P("Seu lugar de pesquisas de neurociência!", Class='main-text title is-3')
+        # retorna uma div com todos os elementos da página
+        return h.DIV((tt1D, tt2D, phr))
 
 
 class LoginPage(SimplePage):
@@ -134,7 +154,6 @@ class LoginPage(SimplePage):
     def check_login_status(self):
         _ = self
         win = _.brython.window
-
         def on_complete(req):
             if req.status == 200:
                 response = req.text
@@ -267,8 +286,6 @@ class LoginPage(SimplePage):
                 for d in dados1:
                     if d.get('email') == email:
                         def click(ev):
-                            if ev.target.id == "cadastro":
-                                self.artigos(resultados)
                             if ev.target.id == "meus_artigos":
                                 self.meus_artigos(resultados)
                             if ev.target.id == "dados":
@@ -311,18 +328,15 @@ class LoginPage(SimplePage):
                         div_resultados = self.brython.document['loginOK']
                         div_resultados.clear()
                         text1 = h.P("Meus dados", style="margin-left: 10px;")
+                        textA = h.P("Meus artigos", style="margin-left: 10px;")
 
-                        #artigos para serem revisados
-                        rev = h.A('Revisar artigos', id="cadastro", Class = "has-text-dark")
-                        revD = h.A(rev, Class="field column is-half is-offset-one-quarter", style="width:200px;")
-                        revF = h.DIV(revD, Class="columns is-mobile")
-                        rev.bind("click", click)
+
+
 
                         #meus artigos
                         art = h.A('Meus artigos', id="meus_artigos", Class="has-text-dark")
                         artD = h.A(art, Class="field column is-half is-offset-one-quarter", style="width:200px;")
                         artF = h.DIV(artD, Class="columns is-mobile")
-                        art.bind("click", click)
 
                         # coluna 1
 
@@ -336,21 +350,17 @@ class LoginPage(SimplePage):
                         tudo.bind("click", click)
 
 
-                        # telefone
-                        telI = h.I(Class="fas fa-book")
-                        tel = h.SPAN(revF, Class="panel-icon")
-                        tudo1 = h.A((tel, telI), id="cadastro",Class="panel-block is-active")
-                        tudo1.bind("click", click)
+
 
                         # meus artigos
                         artI = h.I(Class="fas fa-book")
-                        artA = h.SPAN(artF, Class="panel-icon")
-                        tudo2 = h.A((artA, artI), id="meus_artigos", Class="panel-block is-active")
+                        artA = h.SPAN(artI, Class="panel-icon")
+                        tudo2 = h.A((artA, artI, textA), id="meus_artigos", Class="panel-block is-active")
                         tudo2.bind("click", click)
 
 
                         # encapsula todas as informações do perfil;
-                        col = h.NAV((tit, tudo, tudo1, tudo2), Class="panel is-success", style="width: 300px")
+                        col = h.NAV((tit, tudo, tudo2), Class="panel is-success", style="width: 300px")
                         perfil = h.DIV((col), Class="col")
                         """
                         # coluna2
@@ -648,11 +658,19 @@ class LoginPage(SimplePage):
                             body = d.get("body")
                             tags = d.get("tags")
                             status = d.get("status")
+                            comentarios = d.get("comments", [])
 
                             tit = h.P(title, Class='title is-4')
                             abst = h.P(body, Class='text is-6')
                             tag = h.P(("tag: ", tags), Class="text is-6")
                             sta = h.P(("status: ", status), Class="text is-6")
+
+                            com = h.DIV()
+                            if comentarios:
+                                for comentario in comentarios:
+                                    com <= h.P(comentario, Class="subtitle is-6",
+                                               style="margin-top: 5px; color: #4a4a4a;")
+
                             ac = h.BUTTON('Editar', Class="button is-success",
                                           style="margin-top: 5px;")
                             rec = h.BUTTON('Deletar', Class="button is-danger",
@@ -660,7 +678,7 @@ class LoginPage(SimplePage):
 
 
                             # todos os rascunhos
-                            tor.append(h.DIV((tit, abst, tag, sta, ac, rec), Class='box'))
+                            tor.append(h.DIV((tit, abst, tag, sta,com, ac, rec), Class='box'))
 
                     div_resultados = self.brython.document['loginOK']
                     div_resultados.clear()
@@ -716,11 +734,21 @@ class LoginPage(SimplePage):
                 body = d.get("body")
                 tags = d.get("tags")
                 status = d.get("status")
+                comentarios = d.get("comments", [])
+                print(comentarios)
 
                 tit = h.P(title, Class='title is-4')
                 abst = h.P(body, Class='text is-6')
                 tag = h.P(("tag: ", tags), Class="text is-6")
                 sta = h.P(("status: ", status), Class="text is-6")
+
+                # Exibindo os comentáriosm
+
+                com = h.DIV()
+                if comentarios:
+                    for comentario in comentarios:
+                        com <= h.P(comentario, Class="subtitle is-6", style="margin-top: 5px; color: #4a4a4a;")
+
                 ac = h.BUTTON('Aceito', id=f"aceito_{i}", Class="button is-success", style="margin-top: 5px;")
                 rec = h.BUTTON('Recusado', id=f"recusado_{i}", Class="button is-danger", style="margin-top: 5px; margin-left:5px;")
 
@@ -728,7 +756,7 @@ class LoginPage(SimplePage):
                 rec.bind("click", atualizar_status)
 
                 # todos os rascunhos
-                tor.append(h.DIV((tit, abst, tag,sta, ac, rec), Class='box'))
+                tor.append(h.DIV((tit, abst, tag,sta,com, ac, rec), Class='box'))
 
         div_resultados = self.brython.document['loginOK']
         div_resultados.clear()
@@ -1156,6 +1184,32 @@ class KnowledgePage(SimplePage):
     def show_article(ev):
         SimplePage.PAGES["_ARTIGO_"].show()
 
+    def pergunta(self, ev=None):
+        # Pega o valor do comentário do campo de input
+        com = self.brython.document['comentario'].value
+        titulo = self.brython.document['titulo'].text
+
+        print("Valor do comentário:", com)
+        print("Título do artigo:", titulo)
+
+        # Envia o comentário para o servidor via AJAX
+        def on_complete(req):
+            if req.status == 200:
+                print("Comentário adicionado com sucesso!")
+            else:
+                print("Erro ao adicionar comentário.")
+
+        # Configurando a requisição AJAX para enviar o comentário
+        req = ajax.ajax()
+        req.bind('complete', on_complete)
+        req.open('POST', '/adicionar-comentario', True)
+        req.set_header('content-type', 'application/json')
+
+        # Envia os dados do comentário e título
+        data = json.dumps({"titulo": titulo, "comentario": com})
+        req.send(data)
+
+
     def build_body(self):
         ajax = self.brython.ajax
         h = self.brython.html
@@ -1191,19 +1245,29 @@ class KnowledgePage(SimplePage):
                     tag = h.P(article.get("tags"))
 
                     card_content = h.DIV((
-                        h.P(article.get("title"), Class="title is-4"),
+                        h.P(article.get("title"), Class="title is-4", id="titulo"),
                         h.P(article.get("body")),
                         tag,
-                        h.P("data")), Class="content")
-                    bt1 = h.BUTTON("Artigos Relacionados", id="rel", Class="button", style="margin-left:15px;")
-                    card_buttons = h.DIV((
-                        h.BUTTON("Comentar", Class="button is-primary"),
-                        h.BUTTON("Perguntar", Class="button is-info", style="margin-left:15px;"),
-                        bt1
-                        ))
+                        h.P("24/08/2024")), Class="content")
+                    # bt1 = h.BUTTON("Artigos Relacionados", id="rel", Class="button", style="margin-left:15px;")
+                    # bt = h.BUTTON("Comentar", Class="button is-primary")
+                    # bt.bind("click", self.pergunta)
+                    # card_buttons = h.DIV((
+                    #    bt,
+                    #    h.BUTTON("Perguntar", Class="button is-info", style="margin-left:15px;"),
+                    #    bt1
+                    #    ))
+
+                    butt = h.BUTTON("Comentar", Class="button is-info")
+
+
+                    tex = h.P(h.INPUT(Class="input", id="comentario"), Class="control is-expanded")
+                    form = h.DIV((tex, butt), Class="field is-grouped")
+                    butt.bind("click", self.pergunta)
+
                     but.append(article.get('tags'))
 
-                    card += h.DIV(( card_content, card_buttons), Class="box")
+                    card += h.DIV(( card_content, form), Class="box")
 
                 post = h.DIV((card), Class="column is-half is-offset-one-quarter ")
                 posts.clear()
@@ -1222,6 +1286,7 @@ class KnowledgePage(SimplePage):
 
         wrapper = h.DIV((side_tab, posts), id="loginOK")
         return wrapper
+
 
 
 class Article(SimplePage):
@@ -1297,15 +1362,13 @@ class WritingPage(SimplePage):
         body = doc["body"].value
         tags = doc["tags"].value
         status = "Analise"
-        comentario = ""
         data = {
             "title": title,
             "body": body,
             "tags": tags,
             "status": status,
-            "email": email,
-            "comentario": comentario
-         }
+            "email": email
+        }
 
         self.write(data)
             # USER_OPTIONS = form.elements["username"].value
@@ -1372,7 +1435,7 @@ class WritingPage(SimplePage):
         # Aqui eu criei uma div para armazenar todos os componentes da página
         div = h.DIV()
         # tit == titulo. Esse é o título da página
-        tit = h.P("Escrev0a seu artigo", Class='title is-2 block hero p-2 has-text-success incText')
+        tit = h.P("Escreva sua página", Class='title is-2 block hero p-2 has-text-success incText')
         # aut == autor. Aqui que a pessoa pode botar o nome dela ((só uma ideia inicial))
         aut = h.INPUT(placeholder='Título',
                       Id = "title",
@@ -1456,7 +1519,7 @@ class Arvora:
         #Separando os usuários entre admin e user
         self.users = dict(ADMIN="admin", USER="user")
         self.brython = br
-        self.current_user = None
+        self.current_user = "JUlia"
         Arvora.ARVORA = self
 
     #Criando a função do usuário atual
@@ -1478,6 +1541,8 @@ class Arvora:
         # SimplePage.PAGES['_PERGUNTAS_'] = QuestionsPage(br)
         SimplePage.PAGES["_RASCUNHO_"] = DraftPage(br)
         SimplePage.PAGES["_ESCREVER_"] = WritingPage(br)
+        SimplePage.PAGES["_USER_"] = UserPage(br)
+
 
         _main = LandingPage(br)
         _main.show()
