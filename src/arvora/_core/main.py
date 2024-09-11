@@ -295,26 +295,26 @@ class LoginPage(SimplePage):
                         div_resultados.clear()
                         text1 = h.P("Meus dados", style="margin-left: 10px;")
                         textA = h.P("Meus artigos", style="margin-left: 10px;")
+                        textL = h.P("Logout", style="margin-left: 10px;")
+
 
 
 
                         #meus artigos
-                        art = h.A('Meus artigos', id="meus_artigos", Class="has-text-dark")
+                        art = h.P('Minhas páginas', id="meus_artigos", Class="has-text-dark")
                         artD = h.A(art, Class="field column is-half is-offset-one-quarter", style="width:200px;")
                         artF = h.DIV(artD, Class="columns is-mobile")
 
                         # coluna 1
 
                         # titulo
-                        tit = h.P('PERFIL', Class="panel-heading", style="text-align: left;")
+                        tit = h.P( Class="panel-heading", style="text-align: left;")
 
                         # meus dados
-                        emaI = h.I(Class="fas fa-book")
-                        ema = h.SPAN(emaI, Class="panel-icon")
+                        emaI = h.I(Class="fas fa-user")
+                        ema = h.P(emaI, Class="panel-icon")
                         tudo = h.A((ema, emaI, text1), id="dados", Class="panel-block is-active")
                         tudo.bind("click", click)
-
-
 
 
                         # meus artigos
@@ -323,10 +323,16 @@ class LoginPage(SimplePage):
                         tudo2 = h.A((artA, artI, textA), id="meus_artigos", Class="panel-block is-active")
                         tudo2.bind("click", click)
 
+                        logI = h.I(Class="fas fa-sign-out")
+                        logS = h.SPAN(Class="panel-icon")
+                        logout = h.A((logS, logI, textL), Class="panel-block is-active")
+                        logout.bind("click", self.logout)
+
 
                         # encapsula todas as informações do perfil;
-                        col = h.NAV((tit, tudo, tudo2), Class="panel is-success", style="width: 300px;;")
+                        col = h.NAV((tit, tudo, tudo2, logout), Class="panel is-success", style="width: 300px;;")
                         perfil = h.DIV((col), Class="col")
+
 
                         # encapsula as duas colunas
                         row = h.DIV((perfil), Class="row align-items-start")
@@ -339,10 +345,7 @@ class LoginPage(SimplePage):
                         entrada1 = h.DIV( Class="container text-center", id="perfil")
                         div_resultados <= entrada1
 
-                        # Adiciona o botão de logout
-                        logout_button = h.BUTTON("Logout", Class="button is-danger", style="margin-right: 10px;")
-                        logout_button.bind("click", self.logout)
-                        div_resultados <= logout_button
+
 
             except Exception as e:
                 print('erro ao processar os dados: ', e)
@@ -393,7 +396,7 @@ class LoginPage(SimplePage):
                         tit = h.P('PE', Class="panel-heading", style="text-align: left;")
 
                         # meus dados
-                        emaI = h.I(Class="fas fa-book")
+                        emaI = h.I(Class="fas fa-user")
                         ema = h.SPAN(emaI, Class="panel-icon")
                         tudo = h.A((ema, emaI, text1), id="dados", Class="panel-block is-active")
                         tudo.bind("click", click)
@@ -550,22 +553,19 @@ class LoginPage(SimplePage):
                             tit = h.P('Meus dados', Class="panel-heading", style="text-align: left;")
 
                             # meus dados
-                            emaI = h.I(Class="fas fa-book")
-                            ema = h.SPAN(emaI, Class="panel-icon")
-                            tudo = h.A((ema, emaI, text1), id="dados", Class="panel-block is-active")
+                            ema = h.SPAN( Class="panel-icon")
+                            tudo = h.A((ema, text1), id="dados", Class="panel-block title is-5",style="width: 300px; text-align: left;margin-top: 52px;")
 
                             # telefone
-                            telI = h.I(Class="fas fa-book")
                             tel = h.SPAN(Class="panel-icon")
-                            tudo1 = h.A((tel, telI,text2), id="cadastro", Class="panel-block is-active")
+                            tudo1 = h.A((tel,text2), id="cadastro", Class="panel-block title is-5",style="width: 300px;")
 
                             # meus artigos
-                            artI = h.I(Class="fas fa-book")
                             artA = h.SPAN(Class="panel-icon")
-                            tudo2 = h.A((artA, artI,text3), id="meus_artigos", Class="panel-block is-active")
+                            tudo2 = h.A((artA,text3), id="meus_artigos", Class="panel-block title is-5",style="width: 300px")
 
                             # encapsula todas as informações do perfil;
-                            col = h.NAV((tit, tudo, tudo1, tudo2), Class="panel is-success", style="width: 500px;", id="panel-dados")
+                            col = h.NAV((tit, tudo, tudo1, tudo2), Class="panel is-success", style="width: 800px; height:600px;", id="panel-dados")
                             perfil = h.DIV((col), Class="col")
                             """
                             # coluna2
@@ -639,18 +639,24 @@ class LoginPage(SimplePage):
                                     com <= h.P(comentario, Class="subtitle is-6",
                                                style="margin-top: 5px; color: #4a4a4a;")
 
-                            ac = h.BUTTON('Editar', Class="button is-success",
-                                          style="margin-top: 5px;")
-                            rec = h.BUTTON('Deletar', Class="button is-danger",
-                                           style="margin-top: 5px; margin-left:5px;")
+
+                            ac = h.I(Class="fa fa-trash")
+                            btApagar = h.SPAN((ac, "Apagar"), style="margin-right: 10px;")
+
+                            rec =h.I(Class="fa fa-edit")
+                            btDel = h.SPAN((rec, "Editar"), style="margin-right: 10px;")
+
+                            ver = h.I(Class="fa fa-eye")
+                            btVer = h.SPAN((ver, "Ver"), style="margin-right: 10px;")
+
 
 
                             # todos os rascunhos
-                            tor.append(h.DIV((tit, abst, tag, sta,com, ac, rec), Class='box'))
+                            tor.append(h.DIV((tit, btApagar, btDel, btVer), Class='box'))
 
                     div_resultados = self.brython.document['perfil']
                     div_resultados.clear()
-                    div_resultados <= h.DIV(tor, Class="column body-columns")
+                    div_resultados <= h.DIV(tor, Class="column body-columns", style="margin-right: 300px")
                 else:
                     print("Usuário não encontrado com a sessão fornecida.")
                     SimplePage.PAGES["_MAIN_"].show()
