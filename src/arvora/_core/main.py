@@ -29,6 +29,11 @@ import browser.ajax as ajax
 import json
 
 
+
+#titulo - is-3
+#titulo meus - <h3></h3>
+#nova logo - brainschool
+
 # Aqui uma base de página é criado.
 class SimplePage:
     # Essa classe tem um dicionário de páginas
@@ -294,7 +299,7 @@ class LoginPage(SimplePage):
                         div_resultados = self.brython.document['loginC']
                         div_resultados.clear()
                         text1 = h.P("Meus dados", style="margin-left: 10px;")
-                        textA = h.P("Meus artigos", style="margin-left: 10px;")
+                        textA = h.P("Minhas páginas", style="margin-left: 10px;")
                         textL = h.P("Logout", style="margin-left: 10px;")
 
 
@@ -636,8 +641,7 @@ class LoginPage(SimplePage):
                             com = h.DIV()
                             if comentarios:
                                 for comentario in comentarios:
-                                    com <= h.P(comentario, Class="subtitle is-6",
-                                               style="margin-top: 5px; color: #4a4a4a;")
+                                    com <= h.P(comentario, Class="subtitle is-6",style="margin-top: 5px; color: #4a4a4a;")
 
 
                             ac = h.I(Class="fa fa-trash")
@@ -648,7 +652,6 @@ class LoginPage(SimplePage):
 
                             ver = h.I(Class="fa fa-eye")
                             btVer = h.SPAN((ver, "Ver"), style="margin-right: 10px;")
-
 
 
                             # todos os rascunhos
