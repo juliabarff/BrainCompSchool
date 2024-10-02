@@ -90,7 +90,7 @@ class SimplePage:
                 Class="icon-text", style="color: white;", Id=f"-_{title}_--")
             return h.A(spn, Id=f"_{title}_", Class="navbar-item", href="./#")
 
-        aim = h.IMG(src="/src/arvora/_media/asset3.png", alt="Arvora", height="28", Id="_MAIN_-")
+        aim = h.IMG(src="/src/arvora/_media/minilogo.svg", alt="Arvora", height="28", Id="_MAIN_-")
         arv = h.A(aim, Id="_MAIN_", Class="navbar-item", href="./")
         nbr = h.DIV(arv, Class="navbar-brand", Id="-_MAIN_-")
         self.items = [do_item(**item) for item in menu]
@@ -112,15 +112,14 @@ class LandingPage(SimplePage):
     def build_body(self):
 
         h = self.brython.html
-        tt1 = h.IMG(src="/src/arvora/_media/arvora_logo.png", style="width: 465px;")
+        tt1 = h.IMG(src="/src/arvora/_media/logo.svg", style="width: 465px;")
         tt1D = h.DIV(tt1)
-        tt2 = h.IMG(src="/src/arvora/_media/asset2.png", style="width: 350px; margin-top:20px; margin-left:15px")
-        tt2D = h.DIV(tt2)
+
 
         # phr = phrase
         phr = h.P("Seu lugar de pesquisas de neurociência!", Class='main-text has-text-grey-dark is-3')
         # retorna uma div com todos os elementos da página
-        return h.DIV((tt1D, tt2D, phr))
+        return h.DIV((tt1D, phr))
 
 class UserPage(SimplePage):
     # Inicia os atributos da classe
@@ -963,16 +962,15 @@ class PesquisaPage(SimplePage):
 
             return wrp
 
-        img = h.IMG(src="/src/arvora/_media/arvora_logo.png", Class="img_logo")
-        log = h.IMG(src="/src/arvora/_media/lupa.svg", style="width: 365px;")
-        pes = h.INPUT(log, type="text", Class="input is-success is-rounded mt-5 input-icon", placeholder="Rounded in", style="width: 1000px;")
+        img = h.IMG(src="/src/arvora/_media/logo.svg", Class="img_logo")
+        pes = h.INPUT(type="text", Class="input is-success is-rounded mt-5", placeholder="", style="width: 1000px;")
+        phr = h.P("Seu lugar de pesquisas de neurociência!", Class='main-text has-text-grey-dark is-3')
         bt = h.BUTTON("Pesquisar", id="bt-pesquisa", Class="button is-success is-rounded mt-5 is-responsive", width="68", type='submit').bind("click", refresh)
 
 
-        wrp = h.DIV((img,pes, bt, tor), Class="column body-columns")
+        wrp = h.DIV((img,phr,pes, bt, tor), Class="column body-columns")
 
         return wrp
-
 
 class ProjectPage(SimplePage):
     def __init__(self, brython, menu=MENU_OPTIONS):
@@ -993,12 +991,10 @@ class ProjectPage(SimplePage):
         text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
         #hr = h.HR(Class = "content-divider")
 
-        pj_t1 = h.H1("Projeto ", Class = "title main-subtext")
-        pj_t2 = h.H1("ARVORA", Class="title main-text")
-        pj_t = h.DIV((pj_t1, pj_t2), Class="columns")
-        pj_s = h.H2("O que é a Brain Computational School", Class = "subtitle is-1")
+        pj_i = h.IMG (src="/src/arvora/_media/projeto.svg")
+        pj_t = h.DIV((pj_i), Class="columns")
         pj_a = h.A("Comece aqui!", href='#intro', Class = "button is-white is-medium is-inverted")
-        pj_div=h.DIV((pj_t, pj_s, pj_a), Class="has-text-centered")
+        pj_div=h.DIV((pj_t, pj_a), Class="has-text-centered")
         pj = h.SECTION(pj_div, Class=" hero is-medium hero-body is-fullheight columns is-centered")
 
         r_t = h.H1("Introdução", id = "intro", Class="title is-3 ") # resume title
