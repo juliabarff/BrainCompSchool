@@ -1081,6 +1081,9 @@ users = [
      },]
 
 
+
+
+
 class KnowledgePage(SimplePage):
     # def refresh(ev):
     #     def on_complete(req):
@@ -1154,31 +1157,53 @@ class KnowledgePage(SimplePage):
     def show_article(ev):
         SimplePage.PAGES["_ARTIGO_"].show()
 
-    def pergunta(self, ev=None):
-        # Pega o valor do comentário do campo de input
-        com = self.brython.document['comentario'].value
-        titulo = self.brython.document['titulo'].text
-
-        print("Valor do comentário:", com)
-        print("Título do artigo:", titulo)
-
+    def pergunta(self, event):
         # Envia o comentário para o servidor via AJAX
         def on_complete(req):
             if req.status == 200:
-                print("Comentário adicionado com sucesso!")
+                try:
+                    text = json.loads(req.text)
+                    # 'event.target' se refere ao elemento que foi clicado (no caso, o botão)
+                    button = event.target
+                    # Acessar o título pelo 'textContent' do botão
+                    titulo = button.textContent
+                    print("Título do artigo:", titulo)
+                    for i in text:
+                        if i.get("title") == titulo:
+                            h = self.brython.html
+                            div_knowPage = self.brython.document['knowPage']
+                            div_knowPage.clear()
+                            tag = h.P(i.get("tags"))
+                            tit = i.get("title")
+                            card_content = h.DIV(
+                                (h.P(i.get("title"), Class="title is-4", id="titulo"), tag, h.P("24/08/2024")),
+                                Class="content")
+
+                            # def para mostrar a página
+
+
+
+                            card = h.DIV(card_content, Class="box")
+
+                            post = h.DIV((card), Class="column is-half is-offset-one-quarter")
+                            div_knowPage <= h.DIV(post, Class="columns body-columns")
+                            print("deu certo", i.get("title"))
+
+
+                    # Você pode fazer algo com 'titulo' e 'text' aqui, como mostrar o artigo, etc.
+                except json.JSONDecodeError as e:
+                    print("Erro ao decodificar JSON:", e)
             else:
-                print("Erro ao adicionar comentário.")
+                print("Erro detectado: " + f'{req.status}')
 
         # Configurando a requisição AJAX para enviar o comentário
         req = ajax.ajax()
         req.bind('complete', on_complete)
-        req.open('POST', '/adicionar-comentario', True)
+        # Enviar a requisição para carregar o artigo baseado no título
+        # Aqui você pode modificar o endpoint para passar o título como parâmetro, se necessário
+        req.open('GET', '/load-article', True)
         req.set_header('content-type', 'application/json')
-
-        # Envia os dados do comentário e título
-        data = json.dumps({"titulo": titulo, "comentario": com})
-        req.send(data)
-
+        req.send()  # Enviar a requisição
 
     def build_body(self):
         ajax = self.brython.ajax
@@ -1202,59 +1227,42 @@ class KnowledgePage(SimplePage):
             req.open('GET', '/load-article', True)
             req.set_header('content-type', 'application/json')
             req.send()
-
+    
         def show(articles):
             card = ""
-            but = []
-
 
             # Loop que mostra as páginas de rascunho
             for article in articles:
+                tag = h.P(article.get("tags"))
+                tit = article.get("title")
+                card_content = h.DIV((h.P(article.get("title"), Class="title is-4", id="titulo"),tag,h.P("24/08/2024")), Class="content")
+                butt = h.BUTTON(tit, Class="button is-success")
+                butt.bind("click", self.pergunta)
+                #def para mostrar a página
 
-                if article.get('status') == 'Aceito':
-                    tag = h.P(article.get("tags"))
+                meio = h.DIV(butt, Class="column is-half is-offset-one-quarter")
 
-                    card_content = h.DIV((
-                        h.P(article.get("title"), Class="title is-4", id="titulo"),
-                        h.P(article.get("body")),
-                        tag,
-                        h.P("24/08/2024")), Class="content")
-                    # bt1 = h.BUTTON("Artigos Relacionados", id="rel", Class="button", style="margin-left:15px;")
-                    # bt = h.BUTTON("Comentar", Class="button is-primary")
-                    # bt.bind("click", self.pergunta)
-                    # card_buttons = h.DIV((
-                    #    bt,
-                    #    h.BUTTON("Perguntar", Class="button is-info", style="margin-left:15px;"),
-                    #    bt1
-                    #    ))
-
-                    butt = h.BUTTON("Comentar", Class="button is-info")
+                form = h.DIV((meio), Class="field is-grouped column is-mobile")
 
 
-                    tex = h.P(h.INPUT(Class="input", id="comentario"), Class="control is-expanded")
-                    form = h.DIV((tex, butt), Class="field is-grouped")
-                    butt.bind("click", self.pergunta)
+                card += h.DIV(( card_content, form), Class="box")
 
-                    but.append(article.get('tags'))
-
-                    card += h.DIV(( card_content, form), Class="box")
-
-                post = h.DIV((card), Class="column is-half is-offset-one-quarter ")
+                post = h.DIV((card), Class="column is-half is-offset-one-quarter")
                 posts.clear()
                 posts <= h.DIV(post, Class="columns body-columns")
+
             return posts
 
         get_article()
-
-        btn1 = h.BUTTON("Rascunho", Id='Draft',
-                        Class="button is-success is-rounded mt-5 is-responsive block is-fullwidth")
+        #btn1 = h.BUTTON("Rascunho", Id='Draft',
+        #                Class="button is-success is-rounded mt-5 is-responsive block is-fullwidth")
         btn2 = h.BUTTON("Escreva seu artigo", Id="Writing",
                         Class="button is-success is-rounded mt-5 is-responsive block is-fullwidth")
-        side_tab = h.DIV((btn2, btn1), Class="column is-3")
+        side_tab = h.DIV((btn2), Class="column is-3 is-3 is-offset-9")
         side_tab.bind("click", self.click)
 
 
-        wrapper = h.DIV((side_tab, posts), id="loginOK")
+        wrapper = h.DIV((side_tab, posts), id="knowPage")
         return wrapper
 
 
@@ -1514,7 +1522,7 @@ class Arvora:
         SimplePage.PAGES["_USER_"] = UserPage(br)
 
 
-        _main = LandingPage(br)
+        _main = PesquisaPage(br)
         _main.show()
         return _main
 
