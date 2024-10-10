@@ -22,6 +22,8 @@ Changelog
 |   `Labase <http://labase.selfip.org/>`_ - `NCE <http://portal.nce.ufrj.br>`_ - `UFRJ <https://ufrj.br/>`_.
 
 """
+from symtable import Class
+
 # Então, basicamente ele está transformando essa string com esses nomes em duas listas de substrings e juntando elas com o zip, e depois, transformando elas em uma tupla dos elementos dessa junção das sublistas. Aqui tem as partes do menu. Uma tupla é uma sequência imutável de valores. A função zip combina duas listas, combina o primeiro elemento da lista 1 com o primeiro elememto da lista 2. A função slip faz com que a string se transforme em uma lista de substrings.
 MENU_OPTIONS = tuple(zip("PROJETO CONHECIMENTO PESQUISA PERGUNTAS LOGIN USER RASCUNHO ESCREVER ARTIGO".split(),
                          "bars-progress book book-medical question right-to-bracket user".split()))
@@ -1172,25 +1174,29 @@ class KnowledgePage(SimplePage):
                     titulo = button.textContent
                     print("Título do artigo:", titulo)
                     for i in text:
+                        def click(ev):
+                            if ev.target.id == "voltar":
+                                import browser
+                                browser.window.location.reload(SimplePage.PAGES["_CONHECIMENTO_"].show())
+
                         if i.get("title") == titulo:
                             h = self.brython.html
                             div_knowPage = self.brython.document['knowPage']
                             div_knowPage.clear()
-                            tag = h.P(i.get("tags"))
-                            tit = i.get("title")
-                            card_content = h.DIV(
-                                (h.P(i.get("title"), Class="title is-4", id="titulo"), tag, h.P("24/08/2024")),
-                                Class="content")
+                            tag = h.P(("Tags: ", i.get("tags")), Class="has-text-left title is-6")
+                            texto = h.P(i.get("body"), Class="has-text-justified")
+                            voltar = h.BUTTON('Voltar', id="voltar",Class="button is-primary is-light is-one-fifth mt-3 ml-3")
+                            voltar.bind("click", click)
+                            bVoltar = h.DIV(voltar, Class="columns")
+                            card_content = h.DIV((bVoltar,h.P(i.get("title"), Class="title is-4", id="titulo"),texto, tag, h.P("Data de publicação: 24/08/2024", Class="has-text-left title is-6")),Class="content mx-6")
 
-                            # def para mostrar a página
+                            card = h.DIV(card_content, Class="box ml-6", style="width: 180%")
 
 
 
-                            card = h.DIV(card_content, Class="box")
-
-                            post = h.DIV((card), Class="column is-half is-offset-one-quarter")
+                            post = h.DIV((card), Class="column is-half is-offset-one-quarter ml-6")
                             div_knowPage <= h.DIV(post, Class="columns body-columns")
-                            print("deu certo", i.get("title"))
+
 
 
                     # Você pode fazer algo com 'titulo' e 'text' aqui, como mostrar o artigo, etc.
@@ -1238,19 +1244,18 @@ class KnowledgePage(SimplePage):
             for article in articles:
                 tag = h.P(article.get("tags"))
                 tit = article.get("title")
-                card_content = h.DIV((h.P(article.get("title"), Class="title is-4", id="titulo"),tag,h.P("24/08/2024")), Class="content")
                 butt = h.BUTTON(tit, Class="button is-success")
                 butt.bind("click", self.pergunta)
-                #def para mostrar a página
 
+                #def para mostrar a página
                 meio = h.DIV(butt, Class="column is-half is-offset-one-quarter")
 
-                form = h.DIV((meio), Class="field is-grouped column is-mobile")
+                card_content = h.DIV((h.P(article.get("title"), Class="title is-4", id="titulo"),tag,h.P("24/08/2024"), meio), Class="content")
 
 
-                card += h.DIV(( card_content, form), Class="box")
+                card += h.DIV((card_content), Class="box ml-6", style="width:180%;")
 
-                post = h.DIV((card), Class="column is-half is-offset-one-quarter")
+                post = h.DIV((card), Class="column is-half is-offset-one-quarter ml-6")
                 posts.clear()
                 posts <= h.DIV(post, Class="columns body-columns")
 
@@ -1265,7 +1270,7 @@ class KnowledgePage(SimplePage):
         side_tab.bind("click", self.click)
 
 
-        wrapper = h.DIV((side_tab, posts), id="knowPage")
+        wrapper = h.DIV((posts), id="knowPage")
         return wrapper
 
 
@@ -1525,7 +1530,7 @@ class Arvora:
         SimplePage.PAGES["_USER_"] = UserPage(br)
 
 
-        _main = PesquisaPage(br)
+        _main = LandingPage(br)
         _main.show()
         return _main
 
