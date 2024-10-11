@@ -1183,6 +1183,8 @@ class KnowledgePage(SimplePage):
                             h = self.brython.html
                             div_knowPage = self.brython.document['knowPage']
                             div_knowPage.clear()
+
+                            #coluna do texto
                             tag = h.P(("Tags: ", i.get("tags")), Class="has-text-left title is-6")
                             texto = h.P(i.get("body"), Class="has-text-justified")
                             voltar = h.BUTTON('Voltar', id="voltar",Class="button is-primary is-light is-one-fifth mt-3 ml-3")
@@ -1190,12 +1192,30 @@ class KnowledgePage(SimplePage):
                             bVoltar = h.DIV(voltar, Class="columns")
                             card_content = h.DIV((bVoltar,h.P(i.get("title"), Class="title is-4", id="titulo"),texto, tag, h.P("Data de publicação: 24/08/2024", Class="has-text-left title is-6")),Class="content mx-6")
 
+                            #encapsula numa coluna
                             card = h.DIV(card_content, Class="box ml-6", style="width: 180%")
-
-
-
                             post = h.DIV((card), Class="column is-half is-offset-one-quarter ml-6")
-                            div_knowPage <= h.DIV(post, Class="columns body-columns")
+                            cardText = h.DIV(post, Class="columns is-mobile")
+
+
+                            #coluna dos comentarios
+                            # media
+                            img = h.DIV(h.FIGURE(h.IMG(src= "https://bulma.io/assets/images/placeholders/96x96.png", Class = "image is-48x48")), Class = "media-left" )
+                            nom = h.DIV(h.P("Jorge", Class="title is-4 has-text-left mt-3"), Class="media-content")
+                            media = h.DIV((img, nom), Class="media")
+
+                            # content
+                            content = h.DIV("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus neciaculis mauris.", Class="content has-text-left")
+
+                            # final
+                            card = h.DIV((media, content), Class="card-content")
+                            cardComent = h.DIV(h.DIV(h.DIV(card, Class="card ml-6"), Class="column is-11 is-offset-1 ml-6"), Class="columns is-mobile")
+
+
+
+
+
+                            div_knowPage <= h.DIV((cardText, cardComent))
 
 
 
