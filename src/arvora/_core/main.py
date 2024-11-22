@@ -145,7 +145,7 @@ class UserPage(SimplePage):
         tt2D = h.DIV(tt2)
 
         # phr = phrase
-        phr = h.P("Seu lugar de pesquisas de neurociência!", Class='main-text title is-3')
+        phr = h.P("", Class='main-text title is-3')
         # retorna uma div com todos os elementos da página
         return h.DIV((tt1D, tt2D, phr))
 
@@ -1532,13 +1532,14 @@ class Arvora:
     def user(self, current_user):
         self.current_user = current_user
 
+
     #Função para iniciar
     def start(self):
         br = self.brython
         # Aqui as o nome das páginas são lincadas com as respectivas classes das páginas
         SimplePage.PAGES = {f"_{page}_": SimplePage(br) for page, _ in MENU_OPTIONS}
-        SimplePage.PAGES["_MAIN_"] = LandingPage(br)
-        SimplePage.PAGES["_PESQUISA_"] = PesquisaPage(br)
+        #SimplePage.PAGES["_MAIN_"] = LandingPage(br)
+        SimplePage.PAGES["_MAIN_"] = PesquisaPage(br)
         SimplePage.PAGES["_LOGIN_"] = LoginPage(br)
         SimplePage.PAGES['_CADASTRO_'] = CadastroPage(br)
         SimplePage.PAGES["_PROJETO_"] = ProjectPage(br)
